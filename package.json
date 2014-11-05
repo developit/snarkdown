@@ -1,0 +1,34 @@
+{
+  "name": "snarkdown",
+  "description": "Transform Markdown into HTML.",
+  "version": "0.5.0",
+  "homepage": "https://github.com/developit/snarkdown",
+  "authors": [
+    {
+      "name": "Jason Miller",
+      "email": "jason@developit.ca",
+      "url": "http://developt.ca/"
+    }
+  ],
+  "main": "snarkdown.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/developit/snarkdown.git"
+  },
+  "bugs": {
+    "url": "https://github.com/developit/snarkdown/issues"
+  },
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [
+    "markdown",
+    "gfm",
+    "md",
+    "html",
+    "parser"
+  ],
+  "scripts": {
+    "test": "echo 'No tests defined' && exit 0"
+  }
+}

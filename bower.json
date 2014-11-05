@@ -1,0 +1,32 @@
+{
+  "name": "snarkdown",
+  "main": "snarkdown.js",
+  "version": "0.5.0",
+  "homepage": "https://github.com/developit/snarkdown",
+  "authors": [
+    "Jason Miller <jason@developit.ca>"
+  ],
+  "description": "Transform markdown into HTML.",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "markdown",
+    "gfm",
+    "md",
+    "html",
+    "parser"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "*.md",
+    "package.json"
+  ]
+}
