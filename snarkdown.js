@@ -6,7 +6,7 @@
 		module.exports = factory();
 	}
 	else {
-		root.sharkdown = factory();
+		root.snarkdown = factory();
 	}
 }(this, function() {
 	var tags = {
@@ -28,16 +28,16 @@
 		context[end?'pop':'push'](token);
 		return desc[ end ? 1 : 0 ];
 	}
-	
+
 	function outdent(str, ch) {
 		ch = (ch || '') + (str.match(/^(\t|  )+/m) || ['[\\t ]*'])[0];
 		return str.replace(new RegExp('^'+ch,'gm'),'');
 	}
-	
+
 	function trim(str) {
 		return str.replace(/(^\n+|\n+$)/g,'');
 	}
-	
+
 	function parse(md) {
 		var tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\[([^\]]+?)\]\(([^\)]+?)\)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]))/gm,
 			context = [],
@@ -45,7 +45,7 @@
 			last = 0,
 			chunk, prev, token, esc, reg, inner, t, i;
 		md = trim(md);
-	
+
 		tokenizer.lastIndex = 0;
 		while ( (token=tokenizer.exec(md)) ) {
 			prev = md.substring(last, token.index);
@@ -97,15 +97,15 @@
 			out += prev;
 			out += chunk;
 		}
-		
+
 		out += md.substring(last);
 		for (i=context.length; i--; ) {
 			out += tag(context, context[i]);
 		}
-	
+
 		return trim(out);
 	}
-	
+
 	parse.parse = parse;
 	return parse;
 }));
