@@ -2,7 +2,7 @@ Snarkdown [![NPM Version](http://img.shields.io/npm/v/snarkdown.svg?style=flat)]
 ============
 
 Snarkdown is a simple [Markdown](http://daringfireball.net/projects/markdown/) parser.  
-It is [fast](http://jsperf.com/snarkdown-vs-everyone-else), and extremely small _(**975 bytes** gzipped)_.
+It is [fast](http://jsperf.com/snarkdown-vs-everyone-else/2), and extremely small _(**975 bytes** gzipped)_.
 
 Demo
 ----
