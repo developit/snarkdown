@@ -17,7 +17,8 @@
 			'*' : ['<ul>','</ul>'],
 			'#' : ['<ol>','</ol>']
 		},
-		escaped = /[^\\](\\\\)*\\$/g;
+		escaped = /[^\\](\\\\)*\\$/g,
+		outdentCache = {};
 
 	function tag(context, token) {
 		var norm = token.replace(/\*/g,'_').replace(/^(  \n\n*|\n{2,})/g,'\n\n'),
@@ -30,8 +31,12 @@
 	}
 
 	function outdent(str, ch) {
-		ch = (ch || '') + (str.match(/^(\t|  )+/m) || ['[\\t ]*'])[0];
-		return str.replace(new RegExp('^'+ch,'gm'),'');
+		var r = (ch || '') + (str.match(/^(\t|  )+/m) || ['[\\t ]*'])[0],
+			c = outdentCache[r];
+		if (!c) {
+			outdentCache[r] = c = new RegExp('^'+r, 'gm');
+		}
+		return str.replace(c, '');
 	}
 
 	function trim(str) {
