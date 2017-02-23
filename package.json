@@ -20,7 +20,10 @@
   },
   "license": "MIT",
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
+  },
   "keywords": [
     "markdown",
     "gfm",
@@ -29,6 +32,6 @@
     "parser"
   ],
   "scripts": {
-    "test": "echo 'No tests defined' && exit 0"
+    "test": "mocha"
   }
 }
