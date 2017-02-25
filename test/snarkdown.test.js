@@ -1,5 +1,5 @@
 var expect = require('chai').expect
-var md = require('../snarkdown')
+var md = require('../src')
 
 describe('snarkdown test suite', function () {
   it('parses bold with **', function () {
