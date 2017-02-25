@@ -9,13 +9,7 @@ export default {
 	entry: 'src/index.js',
 	plugins: [
 		buble(),
-		FORMAT==='cjs' && replace({
-			'module.exports = index;': '',
-			'var index =': 'module.exports ='
-		}),
-		FORMAT==='umd' && replace({
-			'return index;': '',
-			'var index =': 'return'
-		})
+		FORMAT==='cjs',
+		FORMAT==='umd'
 	]
 };
