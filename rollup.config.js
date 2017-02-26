@@ -1,5 +1,4 @@
 import buble from 'rollup-plugin-buble';
-import replace from 'rollup-plugin-post-replace';
 
 let { FORMAT } = process.env;
 
