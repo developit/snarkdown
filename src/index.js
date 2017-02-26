@@ -45,13 +45,17 @@ function trim(str) {
 
 export default function parse(md) {
 	// eslint-disable-next-line
-	let tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(?:\]\(([^\)]+?)\)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]))/gm,
+	let tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
 		context = [],
 		out = '',
 		last = 0,
+		links = {},
 		chunk, prev, token, inner, t;
 
-	md = trim(md);
+	md = trim(md).replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
+		links[name.toLowerCase()] = url;
+		return '';
+	});
 
 	while ( (token=tokenizer.exec(md)) ) {
 		prev = md.substring(last, token.index);
@@ -84,24 +88,24 @@ export default function parse(md) {
 		}
 		// Links:
 		else if (token[9]) {
-			out = out.replace('<a>', `<a href="${encodeAttr(token[9])}">`);
+			out = out.replace('<a>', `<a href="${encodeAttr(token[10] || links[prev.toLowerCase()])}">`);
 			chunk = '</a>';
 		}
 		else if (token[8]) {
 			chunk = '<a>';
 		}
 		// Headings:
-		else if (token[10] || token[12]) {
-			t = 'h' + (token[12] ? token[12].length : (token[11][0]==='='?1:2));
-			chunk = '\n\n<'+t+'>' + parse(token[10] || token[13]) + '</'+t+'>\n';
+		else if (token[11] || token[13]) {
+			t = 'h' + (token[13] ? token[13].length : (token[12][0]==='='?1:2));
+			chunk = '\n\n<'+t+'>' + parse(token[11] || token[14]) + '</'+t+'>\n';
 		}
 		// `code`:
-		else if (token[14]) {
-			chunk = '<code>'+token[14]+'</code>';
+		else if (token[15]) {
+			chunk = '<code>'+token[15]+'</code>';
 		}
 		// Inline formatting: *em*, **strong** & friends
-		else if (token[15]) {
-			chunk = tag(context, token[15]);
+		else if (token[16]) {
+			chunk = tag(context, token[16]);
 		}
 		out += prev;
 		out += chunk;

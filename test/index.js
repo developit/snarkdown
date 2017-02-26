@@ -43,7 +43,7 @@ describe('snarkdown()', () => {
 			expect(snarkdown('[Snarkdown](http://github.com/developit/snarkdown)')).to.equal('<a href="http://github.com/developit/snarkdown">Snarkdown</a>');
 		});
 
-		it('parses internal links', () => {
+		it('parses anchor links', () => {
 			expect(snarkdown('[Example](#example)')).to.equal('<a href="#example">Example</a>');
 		});
 
@@ -55,6 +55,10 @@ describe('snarkdown()', () => {
 		it('parses images within links', () => {
 			expect(snarkdown('[![](toc.png)](#toc)')).to.equal('<a href="#toc"><img src="toc.png" alt=""></a>');
 			expect(snarkdown('[![a](a.png)](#a) [![b](b.png)](#b)')).to.equal('<a href="#a"><img src="a.png" alt="a"></a> <a href="#b"><img src="b.png" alt="b"></a>');
+		});
+
+		it('parses reference links', () => {
+			expect(snarkdown('\nhello [World]!\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
 	});
 
