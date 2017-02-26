@@ -7,7 +7,7 @@ const TAGS = {
 	'#' : ['<ol>','</ol>']
 };
 
-const ESCAPED = /[^\\](\\\\)*\\$/g;
+const ESCAPED = /[^\\](\\\\)*\\$/;
 
 /** Given a parser context and a Markdown token, returns an opening or closing tag corresponding to the token's type.
  *	@private
@@ -23,14 +23,10 @@ function tag(context, token) {
 }
 
 /** Outdent a string based on the first indented line's leading whitespace
- *	@param {String} str			The string to outdent
- *	@param {String} [ch='']		Optional regex pattern of characters to ignore before leading whitespace on each line
- *	@returns {String} outdented
  *	@private
  */
-function outdent(str, ch) {
-	ch = (ch || '') + (str.match(/^(\t| {2})+/m) || ['[\\t ]*'])[0];
-	return str.replace(new RegExp('^'+ch,'gm'),'');
+function outdent(str) {
+	return str.replace(new RegExp('^'+(str.match(/^(\t| )+/) || '')[0], 'gm'), '');
 }
 
 /** Encode special attribute characters to HTML entities in a String.
@@ -40,33 +36,33 @@ function encodeAttr(str) {
 	return str.replace(/"/g, '&quot;');
 }
 
+/** Trim leading/trailing newlines only
+ *	@private
+ */
+function trim(str) {
+	return str.replace(/^\n+|\n+$/g, '');
+}
+
 export default function parse(md) {
 	// eslint-disable-next-line
 	let tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(?:\]\(([^\)]+?)\)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]))/gm,
 		context = [],
 		out = '',
 		last = 0,
-		chunk, prev, token, inner, t, i;
+		chunk, prev, token, inner, t;
 
-	// trim leading/trailing newlines only
-	md = md.replace(/^\n+|\n+$/g,'');
+	md = trim(md);
 
-	tokenizer.lastIndex = 0;
 	while ( (token=tokenizer.exec(md)) ) {
 		prev = md.substring(last, token.index);
 		last = tokenizer.lastIndex;
 		chunk = token[0];
-		ESCAPED.lastIndex = 0;
 		if (ESCAPED.test(prev)) {
 			// escaped
 		}
-		// Code blocks:
-		else if (token[2]) {
-			chunk = '\n<pre class="code '+String(token[1]).toLowerCase()+'">'+token[2]+'</pre>\n';
-		}
-		// Indent blocks:
-		else if (token[3]) {
-			chunk = '\n<pre class="code poetry">'+outdent(token[3]).trim()+'</pre>\n';
+		// Code/Indent blocks:
+		else if (token[2] || token[3]) {
+			chunk = '\n<pre class="code '+(token[3]?'poetry':token[1].toLowerCase())+'">'+outdent(trim(token[2] || token[3]))+'</pre>\n';
 		}
 		// > Quotes, -* lists:
 		else if (token[5]) {
@@ -75,7 +71,7 @@ export default function parse(md) {
 				t = '.';
 				token[4] = token[4].replace(/^\d+/gm, '');
 			}
-			inner = parse(outdent(token[4], '[>*+-.]'));
+			inner = parse(outdent(token[4].replace(/^\s*[>*+.-]/gm, '')));
 			if (t!=='>') {
 				t = t==='.' ? '#' : '*';
 				inner = inner.replace(/^(.*)$/gm, '\t<li>$1</li>');
@@ -87,17 +83,14 @@ export default function parse(md) {
 			chunk = `<img src="${encodeAttr(token[7])}" alt="${encodeAttr(token[6])}">`;
 		}
 		// Links:
-		else if (token[8] || token[9]) {
-			if (token[9]) {
-				out = out.replace('<a>', `<a href="${encodeAttr(token[9])}">`);
-				chunk = '</a>';
-			}
-			else {
-				chunk = '<a>';
-			}
-
+		else if (token[9]) {
+			out = out.replace('<a>', `<a href="${encodeAttr(token[9])}">`);
+			chunk = '</a>';
 		}
-		// Titles:
+		else if (token[8]) {
+			chunk = '<a>';
+		}
+		// Headings:
 		else if (token[10] || token[12]) {
 			t = 'h' + (token[12] ? token[12].length : (token[11][0]==='='?1:2));
 			chunk = '\n\n<'+t+'>' + parse(token[10] || token[13]) + '</'+t+'>\n';
@@ -116,9 +109,9 @@ export default function parse(md) {
 
 	out += md.substring(last);
 
-	for (i=context.length; i--; ) {
-		out += tag(context, context[i]);
+	while ((token=context.pop())) {
+		out += tag(context, token);
 	}
 
-	return out.trim();
+	return trim(out);
 }
