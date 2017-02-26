@@ -97,6 +97,8 @@ describe('snarkdown()', () => {
 
 		it('parses three backtricks (```) as a code block', () => {
 			expect(snarkdown('```\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code ">function codeBlocks() {\n\treturn "Can be inserted";\n}</pre>');
+
+			expect(snarkdown('```js\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code js">function codeBlocks() {\n\treturn "Can be inserted";\n}</pre>');
 		});
 
 		it('parses tabs as a code poetry block', () => {
