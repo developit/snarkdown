@@ -1,34 +1,43 @@
-Snarkdown [![NPM Version](http://img.shields.io/npm/v/snarkdown.svg?style=flat)](https://www.npmjs.org/package/snarkdown) [![Bower Version](http://img.shields.io/bower/v/snarkdown.svg?style=flat)](http://bower.io/search/?q=snarkdown)
-============
+# Snarkdown
 
-[![Join the chat at https://gitter.im/developit/snarkdown](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/developit/snarkdown?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![npm](http://img.shields.io/npm/v/snarkdown.svg)](https://npmjs.com/snarkdown) [![travis](https://travis-ci.org/developit/snarkdown.svg?branch=master)](https://travis-ci.org/developit/snarkdown)
 
-Snarkdown is a simple [Markdown](http://daringfireball.net/projects/markdown/) parser.  
-It is [fast](http://jsperf.com/snarkdown-vs-everyone-else/2), and extremely small _(**975 bytes** gzipped)_.
+Snarkdown is a dead simple **1kb** [Markdown] parser.
 
-Demo
-----
-
-Here's a simple JSFiddle demo of the parser:  
-**[Snarkdown Demo](http://jsfiddle.net/developit/64rwu2dn/embedded/result,js,html,css/)**
+It's designed to be as minimal as possible, for constrained use-cases where a full Markdown parser would be inappropriate.
 
 
-About
------
+## Features
 
-License: **MIT**  
-Version: **0.5.0**  
-Date:    **2014-11-04**  
+- **Fast:** since it's basically one regex and a huge if statement
+- **Tiny:** it's 1kb bytes of gzipped ES3
+- **Simple:** pass a Markdown string, get back an HTML string
+
+> **Notes:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
 
 
-Usage
------
+## Usage
 
-Adjust to suit your preferred module format.
+Snarkdown exports a single function. It's available in [every module format](https://unpkg.com/snarkdown/dist/) you'd ever need: es, cjs, and umd.
 
 ```js
-var md = require('snarkdown');
+import snarkdown from 'snarkdown';
 
-var html = md.parse('*this* is __easy__ to `use`.');
-console.log(html);
+let html = snarkdown('_this_ is **easy** to `use`.');
+console.log(html);  // "<em>this</em> is <strong>easy</strong> to <code>use</code>."
 ```
+
+
+## Demo
+
+Here's a simple JSFiddle demo showing live markdown rendering and the generated HTML:
+
+**[Snarkdown Demo](http://jsfiddle.net/developit/828w6t1x/)**
+
+
+## License
+
+MIT
+
+
+[Markdown]: http://daringfireball.net/projects/markdown/
