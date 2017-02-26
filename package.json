@@ -1,8 +1,22 @@
 {
   "name": "snarkdown",
   "description": "Transform Markdown into HTML.",
-  "version": "0.5.0",
-  "homepage": "https://github.com/developit/snarkdown",
+  "version": "1.0.0",
+  "main": "dist/snarkdown.js",
+  "module": "dist/snarkdown.es.js",
+  "jsnext:main": "dist/snarkdown.es.js",
+  "umd:main": "dist/snarkdown.umd.js",
+  "scripts": {
+    "build": "npm-run-all --silent clean rollup -p minify:* -s size",
+    "clean": "rimraf dist && mkdirp dist",
+    "rollup": "rollup -c",
+    "minify:cjs": "uglifyjs $npm_package_main -cm toplevel -o $npm_package_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_main}.map",
+    "minify:umd": "uglifyjs $npm_package_umd_main -cm -o $npm_package_umd_main -p relative --in-source-map ${npm_package_umd_main}.map --source-map ${npm_package_umd_main}.map",
+    "size": "echo \"Gzipped Size: $(strip-json-comments --no-whitespace $npm_package_main | gzip-size --raw)\"",
+    "test": "eslint src test && mocha --compilers babel-register",
+    "prepublish": "npm run -s build",
+    "release": "npm run build -s && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
+  },
   "authors": [
     {
       "name": "Jason Miller",
@@ -10,31 +24,9 @@
       "url": "http://jasonformat.com"
     }
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/developit/snarkdown.git"
-  },
-  "bugs": {
-    "url": "https://github.com/developit/snarkdown/issues"
-  },
+  "homepage": "https://github.com/developit/snarkdown",
+  "repository": "developit/snarkdown",
   "license": "MIT",
-  "dependencies": {},
-  "devDependencies": {
-    "babel-core": "^6.23.1",
-    "babel-preset-latest": "^6.22.0",
-    "babel-register": "^6.23.0",
-    "chai": "^3.5.0",
-    "cross-env": "^3.1.4",
-    "gzip-size-cli": "^2.0.0",
-    "mkdirp": "^0.5.1",
-    "mocha": "^3.2.0",
-    "npm-run-all": "^4.0.2",
-    "rimraf": "^2.6.1",
-    "rollup": "^0.41.4",
-    "rollup-plugin-buble": "^0.15.0",
-    "strip-json-comments-cli": "^1.0.1",
-    "uglify-js": "^2.7.5"
-  },
   "keywords": [
     "markdown",
     "gfm",
@@ -42,21 +34,41 @@
     "html",
     "parser"
   ],
-  "main": "dist/snarkdown.js",
-  "module": "dist/snarkdown.es.js",
-  "jsnext:main": "dist/snarkdown.es.js",
-  "umd:main": "dist/snarkdown.umd.js",
-  "scripts": {
-    "test": "mocha",
-    "build": "npm-run-all --silent clean -p rollup:* -p minify:* -s size",
-    "clean": "rimraf dist && mkdirp dist",
-    "rollup:cjs": "cross-env FORMAT=cjs rollup -c rollup.config.js -f cjs -n $npm_package_name -o $npm_package_main",
-    "rollup:umd": "cross-env FORMAT=umd rollup -c rollup.config.js -f umd -n $npm_package_name -o $npm_package_umd_main",
-    "rollup:esm": "rollup -c rollup.config.js -f es -n $npm_package_name -o $npm_package_module",
-    "minify:cjs": "uglifyjs $npm_package_main -cm toplevel -o $npm_package_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_main}.map",
-    "minify:umd": "uglifyjs $npm_package_umd_main -cm -o $npm_package_umd_main -p relative --in-source-map ${npm_package_umd_main}.map --source-map ${npm_package_umd_main}.map",
-    "size": "echo \"Gzipped Size: $(strip-json-comments --no-whitespace $npm_package_main | gzip-size)\"",
-    "prepublish": "npm run -s build",
-    "release": "npm run build -s && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.23.1",
+    "babel-eslint": "^7.1.1",
+    "babel-preset-latest": "^6.22.0",
+    "babel-register": "^6.23.0",
+    "chai": "^3.5.0",
+    "cross-env": "^3.1.4",
+    "eslint": "^3.16.1",
+    "gzip-size-cli": "^2.0.0",
+    "mkdirp": "^0.5.1",
+    "mocha": "^3.2.0",
+    "npm-run-all": "^4.0.2",
+    "rimraf": "^2.6.1",
+    "rollup": "^0.41.4",
+    "rollup-plugin-buble": "^0.15.0",
+    "rollup-plugin-uglify": "^1.0.1",
+    "strip-json-comments-cli": "^1.0.1",
+    "uglify-js": "^2.7.5"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": "eslint:recommended",
+    "env": {
+      "browser": true,
+      "mocha": true,
+      "node": true,
+      "es6": true
+    },
+    "globals": {
+      "expect": true
+    },
+    "rules": {
+      "no-console": 1,
+      "semi": [2, "always"]
+    }
   }
 }
