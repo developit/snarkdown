@@ -1,10 +1,9 @@
 const TAGS = {
-	_ : ['<em>','</em>'],
-	__ : ['<strong>','</strong>'],
-	'\n\n' : ['<br />'],
-	'>' : ['<blockquote>','</blockquote>'],
-	'*' : ['<ul>','</ul>'],
-	'#' : ['<ol>','</ol>']
+	'' : ['<em>','</em>'],
+	_ : ['<strong>','</strong>'],
+	'\n' : ['<br />'],
+	' ' : ['<br />'],
+	'-': ['<hr />']
 };
 
 /** Outdent a string based on the first indented line's leading whitespace
@@ -22,8 +21,7 @@ function encodeAttr(str) {
 }
 
 export default function parse(md) {
-	// eslint-disable-next-line
-	let tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
+	let tokenizer = /(\n(?:\n---+|\* \*(?: \*)+)\n)|(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
 		context = [],
 		out = '',
 		last = 0,
@@ -31,20 +29,17 @@ export default function parse(md) {
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
-		var norm = token.replace(/\*/g,'_').replace(/^( {2}\n\n*|\n{2,})/g,'\n\n'),
-			end = context[context.length-1]===token,
-			desc = TAGS[norm];
+		var desc = TAGS[token.replace(/\*/g,'_')[1] || ''],
+			end = context[context.length-1]==token;
 		if (!desc) return token;
 		if (!desc[1]) return desc[0];
 		context[end?'pop':'push'](token);
-		return desc[ end ? 1 : 0 ];
+		return desc[end|0];
 	}
 
 	function flush() {
 		let str = '';
-		for (let i=context.length; i--; ) {
-			str += tag(context[i]);
-		}
+		while (context.length) str += tag(context[context.length-1]);
 		return str;
 	}
 
@@ -61,47 +56,47 @@ export default function parse(md) {
 			// escaped
 		}
 		// Code/Indent blocks:
-		else if (token[2] || token[3]) {
-			chunk = '<pre class="code '+(token[3]?'poetry':token[1].toLowerCase())+'">'+outdent((token[2] || token[3]).replace(/^\n+|\n+$/g, ''))+'</pre>';
+		else if (token[3] || token[4]) {
+			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'">'+outdent((token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</pre>';
 		}
 		// > Quotes, -* lists:
-		else if (token[5]) {
-			t = token[5];
-			if (t.charAt(t.length-1)==='.') {
-				t = '.';
-				token[4] = token[4].replace(/^\d+/gm, '');
+		else if (token[6]) {
+			t = token[6];
+			if (t.match(/\./)) {
+				token[5] = token[5].replace(/^\d+/gm, '');
 			}
-			inner = parse(outdent(token[4].replace(/^\s*[>*+.-]/gm, '')));
-			if (t!=='>') {
-				t = t==='.' ? '#' : '*';
+			inner = parse(outdent(token[5].replace(/^\s*[>*+.-]/gm, '')));
+			if (t==='>') t = 'blockquote';
+			else {
+				t = t.match(/\./) ? 'ol' : 'ul';
 				inner = inner.replace(/^(.*)(\n|$)/gm, '<li>$1</li>');
 			}
-			chunk = TAGS[t][0] + inner + TAGS[t][1];
+			chunk = '<'+t+'>' + inner + '</'+t+'>';
 		}
 		// Images:
-		else if (token[7]) {
-			chunk = `<img src="${encodeAttr(token[7])}" alt="${encodeAttr(token[6])}">`;
+		else if (token[8]) {
+			chunk = `<img src="${encodeAttr(token[8])}" alt="${encodeAttr(token[7])}">`;
 		}
 		// Links:
-		else if (token[9]) {
-			out = out.replace('<a>', `<a href="${encodeAttr(token[10] || links[prev.toLowerCase()])}">`);
+		else if (token[10]) {
+			out = out.replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`);
 			chunk = flush() + '</a>';
 		}
-		else if (token[8]) {
+		else if (token[9]) {
 			chunk = '<a>';
 		}
 		// Headings:
-		else if (token[11] || token[13]) {
-			t = 'h' + (token[13] ? token[13].length : (token[12][0]==='='?1:2));
-			chunk = '<'+t+'>' + parse(token[11] || token[14]) + '</'+t+'>';
+		else if (token[12] || token[14]) {
+			t = 'h' + (token[14] ? token[14].length : (token[13][0]==='='?1:2));
+			chunk = '<'+t+'>' + parse(token[12] || token[15]) + '</'+t+'>';
 		}
 		// `code`:
-		else if (token[15]) {
-			chunk = '<code>'+token[15]+'</code>';
+		else if (token[16]) {
+			chunk = '<code>'+token[16]+'</code>';
 		}
 		// Inline formatting: *em*, **strong** & friends
-		else if (token[16]) {
-			chunk = tag(token[16]);
+		else if (token[17] || token[1]) {
+			chunk = tag(token[17] || '--');
 		}
 		out += prev;
 		out += chunk;

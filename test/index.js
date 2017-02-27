@@ -112,6 +112,20 @@ describe('snarkdown()', () => {
 		it('parses a block quote', () => {
 			expect(snarkdown('> To be or not to be')).to.equal('<blockquote>To be or not to be</blockquote>');
 		});
+
+		it('parses lists within block quotes', () => {
+			expect(snarkdown('> - one\n> - two\n> - **three**\nhello')).to.equal('<blockquote><ul><li>one</li><li>two</li><li><strong>three</strong></li></ul></blockquote>\nhello');
+		});
+	});
+
+	describe('horizontal rules', () => {
+		it('should parse ---', () => {
+			expect(snarkdown('foo\n\n---\nbar')).to.equal('foo<hr />bar');
+		});
+
+		it('should parse * * *', () => {
+			expect(snarkdown('foo\n* * *\nbar')).to.equal('foo<hr />bar');
+		});
 	});
 
 	describe('edge cases', () => {
