@@ -15,7 +15,7 @@
     "size": "echo \"Gzipped Size: $(strip-json-comments --no-whitespace $npm_package_main | gzip-size --raw)\"",
     "test": "eslint src test && mocha --compilers babel-register",
     "prepublish": "npm run -s build",
-    "release": "npm run build -s && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
+    "release": "npm run -s build && npm test && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
   "authors": [
     "Jason Miller <jason@developit.ca>"
