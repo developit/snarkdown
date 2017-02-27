@@ -18,7 +18,7 @@ function outdent(str) {
  *	@private
  */
 function encodeAttr(str) {
-	return str.replace(/"/g, '&quot;');
+	return (str+'').replace(/"/g, '&quot;');
 }
 
 export default function parse(md) {
