@@ -10,7 +10,7 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 ## Features
 
 - **Fast:** since it's basically one regex and a huge if statement
-- **Tiny:** it's 1kb bytes of gzipped ES3
+- **Tiny:** it's 1kb of gzipped ES3
 - **Simple:** pass a Markdown string, get back an HTML string
 
 > **Notes:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
