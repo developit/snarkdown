@@ -33,18 +33,13 @@
 		ch = (ch || '') + (str.match(/^(\t|  )+/m) || ['[\\t ]*'])[0];
 		return str.replace(new RegExp('^'+ch,'gm'),'');
 	}
-
-	function trim(str) {
-		return str.replace(/(^\n+|\n+$)/g,'');
-	}
-
+	
 	function parse(md) {
-		var tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\[([^\]]+?)\]\(([^\)]+?)\)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]))/gm,
+		var tokenizer = /(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t| {4,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\[([^\]]+?)\]\(([^\)]+?)\)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]))/gm,
 			context = [],
 			out = '',
 			last = 0,
 			chunk, prev, token, esc, reg, inner, t, i;
-		md = trim(md);
 
 		tokenizer.lastIndex = 0;
 		while ( (token=tokenizer.exec(md)) ) {
@@ -61,7 +56,7 @@
 			}
 			// Indent blocks:
 			else if (token[3]) {
-				chunk = '\n<pre class="code poetry">'+trim(outdent(token[3]))+'</pre>\n';
+				chunk = '\n<pre class="code poetry">'+outdent(token[3].trim())+'</pre>\n';
 			}
 			// > Quotes, -* lists:
 			else if (token[5]) {
@@ -103,7 +98,7 @@
 			out += tag(context, context[i]);
 		}
 
-		return trim(out);
+		return out.trim;
 	}
 
 	parse.parse = parse;
