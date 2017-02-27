@@ -7,26 +7,11 @@ const TAGS = {
 	'#' : ['<ol>','</ol>']
 };
 
-const ESCAPED = /[^\\](\\\\)*\\$/;
-
-/** Given a parser context and a Markdown token, returns an opening or closing tag corresponding to the token's type.
- *	@private
- */
-function tag(context, token) {
-	var norm = token.replace(/\*/g,'_').replace(/^( {2}\n\n*|\n{2,})/g,'\n\n'),
-		end = context[context.length-1]===token,
-		desc = TAGS[norm];
-	if (!desc) return token;
-	if (desc[1]===false) return desc[0];
-	context[end?'pop':'push'](token);
-	return desc[ end ? 1 : 0 ];
-}
-
 /** Outdent a string based on the first indented line's leading whitespace
  *	@private
  */
 function outdent(str) {
-	return str.replace(new RegExp('^'+(str.match(/^(\t| )+/) || '')[0], 'gm'), '');
+	return str.replace(RegExp('^'+(str.match(/^(\t| )+/) || '')[0], 'gm'), '');
 }
 
 /** Encode special attribute characters to HTML entities in a String.
@@ -34,13 +19,6 @@ function outdent(str) {
  */
 function encodeAttr(str) {
 	return str.replace(/"/g, '&quot;');
-}
-
-/** Trim leading/trailing newlines only
- *	@private
- */
-function trim(str) {
-	return str.replace(/^\n+|\n+$/g, '');
 }
 
 export default function parse(md) {
@@ -52,7 +30,16 @@ export default function parse(md) {
 		links = {},
 		chunk, prev, token, inner, t;
 
-	md = trim(md).replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
+	function tag(token) {
+		var norm = token.replace(/\*/g,'_').replace(/^( {2}\n\n*|\n{2,})/g,'\n\n'),
+			end = context[context.length-1]===token,
+			desc = TAGS[norm];
+		if (!desc) return token;
+		if (!desc[1]) return desc[0];
+		context[end?'pop':'push'](token);
+		return desc[ end ? 1 : 0 ];
+	}
+
 	function flush() {
 		let str = '';
 		for (let i=context.length; i--; ) {
@@ -61,6 +48,7 @@ export default function parse(md) {
 		return str;
 	}
 
+	md = md.replace(/^\n+|\n+$/g, '').replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
 		links[name.toLowerCase()] = url;
 		return '';
 	});
@@ -69,7 +57,7 @@ export default function parse(md) {
 		prev = md.substring(last, token.index);
 		last = tokenizer.lastIndex;
 		chunk = token[0];
-		if (ESCAPED.test(prev)) {
+		if (prev.match(/[^\\](\\\\)*\\$/)) {
 			// escaped
 		}
 		// Code/Indent blocks:
@@ -113,15 +101,11 @@ export default function parse(md) {
 		}
 		// Inline formatting: *em*, **strong** & friends
 		else if (token[16]) {
-			chunk = tag(context, token[16]);
+			chunk = tag(token[16]);
 		}
 		out += prev;
 		out += chunk;
 	}
 
-	out += md.substring(last);
-
-	out += flush();
-
-	return trim(out);
+	return (out + md.substring(last) + flush()).trim();
 }
