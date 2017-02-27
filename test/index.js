@@ -113,4 +113,21 @@ describe('snarkdown()', () => {
 			expect(snarkdown('> To be or not to be')).to.equal('<blockquote>\nTo be or not to be\n</blockquote>');
 		});
 	});
+
+	describe('edge cases', () => {
+		it('should close unclosed tags', () => {
+			expect(snarkdown('*foo')).to.equal('<em>foo</em>');
+			expect(snarkdown('foo**')).to.equal('foo<strong></strong>');
+			expect(snarkdown('[some **bold text](#winning)')).to.equal('<a href="#winning">some <strong>bold text</strong></a>');
+			expect(snarkdown('`foo')).to.equal('`foo');
+		});
+
+		it('should not choke on single characters', () => {
+			expect(snarkdown('*')).to.equal('<em></em>');
+			expect(snarkdown('_')).to.equal('<em></em>');
+			expect(snarkdown('**')).to.equal('<strong></strong>');
+			expect(snarkdown('>')).to.equal('>');
+			expect(snarkdown('`')).to.equal('`');
+		});
+	});
 });

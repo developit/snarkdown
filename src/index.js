@@ -53,6 +53,14 @@ export default function parse(md) {
 		chunk, prev, token, inner, t;
 
 	md = trim(md).replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
+	function flush() {
+		let str = '';
+		for (let i=context.length; i--; ) {
+			str += tag(context[i]);
+		}
+		return str;
+	}
+
 		links[name.toLowerCase()] = url;
 		return '';
 	});
@@ -89,7 +97,7 @@ export default function parse(md) {
 		// Links:
 		else if (token[9]) {
 			out = out.replace('<a>', `<a href="${encodeAttr(token[10] || links[prev.toLowerCase()])}">`);
-			chunk = '</a>';
+			chunk = flush() + '</a>';
 		}
 		else if (token[8]) {
 			chunk = '<a>';
@@ -113,9 +121,7 @@ export default function parse(md) {
 
 	out += md.substring(last);
 
-	while ((token=context.pop())) {
-		out += tag(context, token);
-	}
+	out += flush();
 
 	return trim(out);
 }
