@@ -17,7 +17,7 @@ function outdent(str) {
  *	@private
  */
 function encodeAttr(str) {
-	return (str+'').replace(/"/g, '&quot;');
+	return (str+'').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 /** Parse Markdown into an HTML String. */
@@ -58,7 +58,7 @@ export default function parse(md) {
 		}
 		// Code/Indent blocks:
 		else if (token[3] || token[4]) {
-			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'">'+outdent((token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</pre>';
+			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'">'+outdent(encodeAttr(token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</pre>';
 		}
 		// > Quotes, -* lists:
 		else if (token[6]) {
@@ -93,7 +93,7 @@ export default function parse(md) {
 		}
 		// `code`:
 		else if (token[16]) {
-			chunk = '<code>'+token[16]+'</code>';
+			chunk = '<code>'+encodeAttr(token[16])+'</code>';
 		}
 		// Inline formatting: *em*, **strong** & friends
 		else if (token[17] || token[1]) {
