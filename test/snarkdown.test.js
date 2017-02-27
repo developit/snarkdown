@@ -78,8 +78,13 @@ describe('snarkdown test suite', function () {
     expect(md.parse('Something with  \na line break')).to.be.eql('Something with<br />\n\na line break')
   })
 
-  it('parses tabs as a code poetry block', function () {
+  it('parses tabs and four or more spaces as a code poetry block', function () {
     expect(md.parse('\tvar a = 1')).to.be.eql('<pre class="code poetry">var a = 1</pre>')
+    expect(md.parse('        outerspace      ')).to.be.eql('<pre class="code poetry">outerspace</pre>')
+    expect(md.parse('        outerspace\n    outerouterspace')).to.be.eql('<pre class="code poetry">outerspace\nouterouterspace</pre>')
+    expect(md.parse('        outerspacewithbreak\n\n    lbouterouterspace')).to.be.eql('<pre class="code poetry">outerspacewithbreak\n\nlbouterouterspace</pre>')
+    expect(md.parse('   3 spaces      ')).to.be.eql('3 spaces')
+    expect(md.parse('\n   3 spaces')).to.be.eql('3 spaces')
   })
 
   it('parses three backtricks (```) as a code block', function () {
