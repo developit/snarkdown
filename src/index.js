@@ -1,7 +1,7 @@
 const TAGS = {
 	_ : ['<em>','</em>'],
 	__ : ['<strong>','</strong>'],
-	'\n\n' : ['<br />\n\n', false],
+	'\n\n' : ['<br />'],
 	'>' : ['<blockquote>','</blockquote>'],
 	'*' : ['<ul>','</ul>'],
 	'#' : ['<ol>','</ol>']
@@ -74,7 +74,7 @@ export default function parse(md) {
 		}
 		// Code/Indent blocks:
 		else if (token[2] || token[3]) {
-			chunk = '\n<pre class="code '+(token[3]?'poetry':token[1].toLowerCase())+'">'+outdent(trim(token[2] || token[3]))+'</pre>\n';
+			chunk = '<pre class="code '+(token[3]?'poetry':token[1].toLowerCase())+'">'+outdent((token[2] || token[3]).replace(/^\n+|\n+$/g, ''))+'</pre>';
 		}
 		// > Quotes, -* lists:
 		else if (token[5]) {
@@ -86,9 +86,9 @@ export default function parse(md) {
 			inner = parse(outdent(token[4].replace(/^\s*[>*+.-]/gm, '')));
 			if (t!=='>') {
 				t = t==='.' ? '#' : '*';
-				inner = inner.replace(/^(.*)$/gm, '\t<li>$1</li>');
+				inner = inner.replace(/^(.*)(\n|$)/gm, '<li>$1</li>');
 			}
-			chunk = '\n'+TAGS[t][0]+'\n' + inner + '\n'+TAGS[t][1]+'\n';
+			chunk = TAGS[t][0] + inner + TAGS[t][1];
 		}
 		// Images:
 		else if (token[7]) {
@@ -105,7 +105,7 @@ export default function parse(md) {
 		// Headings:
 		else if (token[11] || token[13]) {
 			t = 'h' + (token[13] ? token[13].length : (token[12][0]==='='?1:2));
-			chunk = '\n\n<'+t+'>' + parse(token[11] || token[14]) + '</'+t+'>\n';
+			chunk = '<'+t+'>' + parse(token[11] || token[14]) + '</'+t+'>';
 		}
 		// `code`:
 		else if (token[15]) {

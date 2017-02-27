@@ -64,33 +64,33 @@ describe('snarkdown()', () => {
 
 	describe('lists', () => {
 		it('parses an unordered list with *', () => {
-			expect(snarkdown('* One\n* Two')).to.equal('<ul>\n\t<li>One</li>\n\t<li>Two</li>\n</ul>');
+			expect(snarkdown('* One\n* Two')).to.equal('<ul><li>One</li><li>Two</li></ul>');
 		});
 
 		it('parses an unordered list with -', () => {
-			expect(snarkdown('- One\n- Two')).to.equal('<ul>\n\t<li>One</li>\n\t<li>Two</li>\n</ul>');
+			expect(snarkdown('- One\n- Two')).to.equal('<ul><li>One</li><li>Two</li></ul>');
 		});
 
 		it('parses an unordered list with +', () => {
-			expect(snarkdown('+ One\n+ Two')).to.equal('<ul>\n\t<li>One</li>\n\t<li>Two</li>\n</ul>');
+			expect(snarkdown('+ One\n+ Two')).to.equal('<ul><li>One</li><li>Two</li></ul>');
 		});
 
 		it('parses an unordered list with mixed bullet point styles', () => {
-			expect(snarkdown('+ One\n* Two\n- Three')).to.equal('<ul>\n\t<li>One</li>\n\t<li>Two</li>\n\t<li>Three</li>\n</ul>');
+			expect(snarkdown('+ One\n* Two\n- Three')).to.equal('<ul><li>One</li><li>Two</li><li>Three</li></ul>');
 		});
 
 		it('parses an ordered list', () => {
-			expect(snarkdown('1. Ordered\n2. Lists\n4. Numbers are ignored')).to.equal('<ol>\n\t<li>Ordered</li>\n\t<li>Lists</li>\n\t<li>Numbers are ignored</li>\n</ol>');
+			expect(snarkdown('1. Ordered\n2. Lists\n4. Numbers are ignored')).to.equal('<ol><li>Ordered</li><li>Lists</li><li>Numbers are ignored</li></ol>');
 		});
 	});
 
 	describe('line breaks', () => {
 		it('parses two new lines as line breaks', () => {
-			expect(snarkdown('Something with\n\na line break')).to.equal('Something with<br />\n\na line break');
+			expect(snarkdown('Something with\n\na line break')).to.equal('Something with<br />a line break');
 		});
 
 		it('parses two spaces as a line break', () => {
-			expect(snarkdown('Something with  \na line break')).to.equal('Something with<br />\n\na line break');
+			expect(snarkdown('Something with  \na line break')).to.equal('Something with<br />a line break');
 		});
 	});
 
@@ -110,7 +110,7 @@ describe('snarkdown()', () => {
 		});
 
 		it('parses a block quote', () => {
-			expect(snarkdown('> To be or not to be')).to.equal('<blockquote>\nTo be or not to be\n</blockquote>');
+			expect(snarkdown('> To be or not to be')).to.equal('<blockquote>To be or not to be</blockquote>');
 		});
 	});
 
