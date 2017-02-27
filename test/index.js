@@ -121,10 +121,14 @@ describe('snarkdown()', () => {
 	describe('horizontal rules', () => {
 		it('should parse ---', () => {
 			expect(snarkdown('foo\n\n---\nbar')).to.equal('foo<hr />bar');
+			expect(snarkdown('foo\n\n----\nbar'), '----').to.equal('foo<hr />bar');
+			expect(snarkdown('> foo\n\n---\nbar')).to.equal('<blockquote>foo</blockquote><hr />bar');
 		});
 
 		it('should parse * * *', () => {
 			expect(snarkdown('foo\n* * *\nbar')).to.equal('foo<hr />bar');
+			expect(snarkdown('foo\n* * * *\nbar'), '* * * *').to.equal('foo<hr />bar');
+			expect(snarkdown('> foo\n\n* * *\nbar')).to.equal('<blockquote>foo</blockquote><hr />bar');
 		});
 	});
 
