@@ -60,6 +60,14 @@ describe('snarkdown()', () => {
 		it('parses reference links', () => {
 			expect(snarkdown('\nhello [World]!\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
+
+		it('allows the rel attribute to be specified on links', () => {
+			expect(snarkdown('[Snarkdown](http://github.com/developit/snarkdown)', {link_rel : 'nofollow noopener'})).to.equal('<a href="http://github.com/developit/snarkdown" rel="nofollow noopener">Snarkdown</a>');
+		});
+
+		it('allows the target attribute to be specified on links', () => {
+			expect(snarkdown('[Snarkdown](http://github.com/developit/snarkdown)', {link_target : '_blank'})).to.equal('<a href="http://github.com/developit/snarkdown" target="_blank">Snarkdown</a>');
+		});
 	});
 
 	describe('lists', () => {
