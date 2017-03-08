@@ -21,6 +21,12 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 > **Notes:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
 
 
+## Demos & Examples
+
+- ⚛️ [**Snarky**](https://snarky.surge.sh) - markdown editor built with Preact & Snarkdown
+- ✏️ [**Simple Markdown Editor**](http://jsfiddle.net/developit/828w6t1x/)
+
+
 ## Usage
 
 Snarkdown exports a single function, which parses a string of Markdown and returns a String of HTML. Couldn't be simpler.
@@ -36,11 +42,6 @@ console.log(html);
 // <em>this</em> is <strong>easy</strong> to <code>use</code>.
 ```
 
-
-## Demos & Examples
-
-- ✏️ [**Live Markdown Editor**](http://jsfiddle.net/developit/828w6t1x/)
-- ⚛️ [**Snarkdown + Preact**](https://jsfiddle.net/developit/safybf14/embedded/result,js,css,resources/)
 
 ## License
 
