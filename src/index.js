@@ -20,14 +20,57 @@ function encodeAttr(str) {
 	return (str+'').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Moved links to global scope
+// This allows all block parsers to handle reference urls
+//
+// I'm not sure that this is a good solution, maybe urls should
+// be passed as second parameter to parse fn for nested parses?
+//
+// function parse(md, links) {
+// ...
+//     let links = links || {};
+// ...
+// }
+let links = {};
+
 /** Parse Markdown into an HTML String. */
 export default function parse(md) {
-	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
+	// let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
+
+	// 1. changed code regexp
+	//    from (?:^```(\w*)\n([\s\S]*?)\n```$)
+	//    to   (?:(?:^|\n+)```(\w*)\n([\s\S]*?)\n```$)
+
+	// 2. changed inline regexp
+	//    from (  \n\n*|\n{2,}|__|\*\*|[_*])
+	//    to   (  \n\n*|__|\*\*|[_*])
+	//
+	//    (not shure what '  \n\n*' does)
+
+	// 3. added two paragraph regexes
+	//
+	//    one targets usual case, start of string or lots of newlines folowed by text,
+	//    followed by 2+ newlines - ((?:^|\n+)(?:[\s\S]+?)(?=\n{2,}))
+	//
+	//    second targets specifically last paragraph in group (\n+[\s\S]+)
+
+	// 4. changed end of both regexps for headings
+	//    from (?:\n+|$)
+	//    to   (?=\n+|$)
+	//
+	//    (it leaves newlines for paragraphs untouched)
+
+	// 5. changed end of <hr /> regexp
+	//    from \n
+	//    to   (?=\n)
+	//
+	//    (again, it leaves newlines untouched for paragraphs)
+
+	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)(?=\n))|(?:(?:^|\n+)```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?=\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?=\n+|$))|(?:`([^`].*?)`)|(  \n\n*|__|\*\*|[_*])|((?:^|\n+)(?:[\s\S]+?)(?=\n{2,}))|(\n+[\s\S]+)/gm,
 		context = [],
 		out = '',
 		last = 0,
-		links = {},
-		chunk, prev, token, inner, t;
+		chunk, prev, token, inner, t, p;
 
 	function tag(token) {
 		var desc = TAGS[token.replace(/\*/g,'_')[1] || ''],
@@ -44,10 +87,12 @@ export default function parse(md) {
 		return str;
 	}
 
-	md = md.replace(/^\n+|\n+$/g, '').replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
+	// Moved 'trim' to the end of chain because reference links
+	// could leave trailing newlines
+	md = md.replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
 		links[name.toLowerCase()] = url;
 		return '';
-	});
+	}).replace(/^\n+|\n+$/g, '');
 
 	while ( (token=tokenizer.exec(md)) ) {
 		prev = md.substring(last, token.index);
@@ -99,6 +144,19 @@ export default function parse(md) {
 		else if (token[17] || token[1]) {
 			chunk = tag(token[17] || '--');
 		}
+		// Paragraphs
+		else if (token[18] || token[19]) {
+			p = (token[18] || token[19]).trim();
+			// Right now there is a problem with p regexp,
+			// lists are included in it too, this checks for list once again.
+			// I don't like this solution, but can't come up with other one for
+			// this moment
+			if (/(?:^|\n)([>*+-]|\d+\.)\s+.*/.test(p)) chunk = parse(p);
+			else {
+				chunk = '<p>' + parse(p) + '</p>';
+			}
+		}
+
 		out += prev;
 		out += chunk;
 	}
