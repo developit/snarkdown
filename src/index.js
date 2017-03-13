@@ -23,7 +23,7 @@ function encodeAttr(str) {
 // Moved links to global scope
 // This allows all block parsers to handle reference urls
 //
-// Again, I'm not sure that this is a good solution, maybe urls should
+// I'm not sure that this is a good solution, maybe urls should
 // be passed as second parameter to parse fn for nested parses?
 //
 // function parse(md, links) {
@@ -52,7 +52,7 @@ export default function parse(md) {
 	//    one targets usual case, start of string or lots of newlines folowed by text,
 	//    followed by 2+ newlines - ((?:^|\n+)(?:[\s\S]+?)(?=\n{2,}))
 	//
-	//    second targets specifically last paragraph in group (\n{2,}[\s\S]+)
+	//    second targets specifically last paragraph in group (\n+[\s\S]+)
 
 	// 4. changed end of both regexps for headings
 	//    from (?:\n+|$)
@@ -60,7 +60,13 @@ export default function parse(md) {
 	//
 	//    (it leaves newlines for paragraphs untouched)
 
-	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:(?:^|\n+)```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?=\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?=\n+|$))|(?:`([^`].*?)`)|(  \n\n*|__|\*\*|[_*])|((?:^|\n+)(?:[\s\S]+?)(?=\n{2,}))|(\n{2,}[\s\S]+)/gm,
+	// 5. changed end of <hr /> regexp
+	//    from \n
+	//    to   (?=\n)
+	//
+	//    (again, it leaves newlines untouched for paragraphs)
+
+	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)(?=\n))|(?:(?:^|\n+)```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?=\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?=\n+|$))|(?:`([^`].*?)`)|(  \n\n*|__|\*\*|[_*])|((?:^|\n+)(?:[\s\S]+?)(?=\n{2,}))|(\n+[\s\S]+)/gm,
 		context = [],
 		out = '',
 		last = 0,
