@@ -20,6 +20,19 @@ function encodeAttr(str) {
 	return (str+'').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Moved links to global scope
+// This allows all block parsers to handle reference urls
+//
+// Again, I'm not sure that this is a good solution, maybe urls should
+// be passed as second parameter to parse fn for nested parses?
+//
+// function parse(md, links) {
+// ...
+//     let links = links || {};
+// ...
+// }
+let links = {};
+
 /** Parse Markdown into an HTML String. */
 export default function parse(md) {
 	// let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
@@ -51,7 +64,6 @@ export default function parse(md) {
 		context = [],
 		out = '',
 		last = 0,
-		links = {},
 		chunk, prev, token, inner, t, p;
 
 	function tag(token) {
@@ -128,7 +140,7 @@ export default function parse(md) {
 		}
 		// Paragraphs
 		else if (token[18] || token[19]) {
-			p = (token[18] || token[19]).trim()
+			p = (token[18] || token[19]).trim();
 			// Right now there is a problem with p regexp,
 			// lists are included in it too, this checks for list once again.
 			// I don't like this solution, but can't come up with other one for
