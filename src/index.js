@@ -133,7 +133,7 @@ export default function parse(md) {
 			// lists are included in it too, this checks for list once again.
 			// I don't like this solution, but can't come up with other one for
 			// this moment
-			if (/([>*+-]|\d+\.)\s+.*/.test(p)) chunk = parse(p);
+			if (/(?:^|\n)([>*+-]|\d+\.)\s+.*/.test(p)) chunk = parse(p);
 			else {
 				chunk = '<p>' + parse(p) + '</p>';
 			}

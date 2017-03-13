@@ -2,5 +2,5 @@ dist
 node_modules
 npm-debug.log
 bower_components
-.*
-!.gitignore
+.DS_Store
+.test.js
