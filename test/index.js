@@ -60,6 +60,10 @@ describe('snarkdown()', () => {
 		it('parses reference links', () => {
 			expect(snarkdown('\nhello [World]!\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
+
+    it('parses reference links without creating excessive linebreaks', () => {
+      expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
+    });
 	});
 
 	describe('lists', () => {
