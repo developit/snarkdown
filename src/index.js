@@ -44,10 +44,10 @@ export default function parse(md) {
 		return str;
 	}
 
-	md = md.replace(/^\n+|\n+$/g, '').replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
+	md = md.replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
 		links[name.toLowerCase()] = url;
 		return '';
-	});
+	}).replace(/^\n+|\n+$/g, '');
 
 	while ( (token=tokenizer.exec(md)) ) {
 		prev = md.substring(last, token.index);
