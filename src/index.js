@@ -21,12 +21,12 @@ function encodeAttr(str) {
 }
 
 /** Parse Markdown into an HTML String. */
-export default function parse(md) {
+export default function parse(md, prevLinks) {
 	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
 		context = [],
 		out = '',
+		links = prevLinks || {},
 		last = 0,
-		links = {},
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
@@ -89,7 +89,7 @@ export default function parse(md) {
 		// Headings:
 		else if (token[12] || token[14]) {
 			t = 'h' + (token[14] ? token[14].length : (token[13][0]==='='?1:2));
-			chunk = '<'+t+'>' + parse(token[12] || token[15]) + '</'+t+'>';
+			chunk = '<'+t+'>' + parse(token[12] || token[15], links) + '</'+t+'>';
 		}
 		// `code`:
 		else if (token[16]) {
