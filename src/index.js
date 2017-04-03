@@ -99,13 +99,13 @@ export default function parse(md, prevLinks) {
 		else if (token[17] || token[1]) {
 			chunk = tag(token[17] || '--');
 		}
-    // Table parser
-    else if (token[18]) {
-      var tr = (a, r) => ('<tr>' + a.split('|').reduce((b, v) => b + (v ? ('<' + r + v.trim() + '</' + r) : '')) + '</tr>'),
-        h = token[19] ? tr(token[19], token[20] ? 'th>' : 'td>') : '',
-        c = token[21] ? token[21].split('\n').reduce((a, v) => a + (v ? tr(v, 'td>') : '')) : '';
-      chunk = '<table>' + h + c + '</table>';
-    }
+		// Table parser
+		else if (token[18]) {
+			var tr = (a, r) => ('<tr>' + a.split('|').reduce((b, v) => b + (v ? ('<' + r + v.trim() + '</' + r) : '')) + '</tr>'),
+				h = token[19] ? tr(token[19], token[20] ? 'th>' : 'td>') : '',
+				c = token[21] ? token[21].split('\n').reduce((a, v) => a + (v ? tr(v, 'td>') : '')) : '';
+			chunk = '<table>' + h + c + '</table>';
+		}
 		out += prev;
 		out += chunk;
 	}

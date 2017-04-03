@@ -67,9 +67,9 @@ describe('snarkdown()', () => {
 			expect(snarkdown('\nhello [World]!\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
 
-    it('parses reference links without creating excessive linebreaks', () => {
-      expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
-    });
+		it('parses reference links without creating excessive linebreaks', () => {
+			expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
+		});
 	});
 
 	describe('lists', () => {
@@ -151,35 +151,35 @@ describe('snarkdown()', () => {
 		});
 	});
 
-  describe('edge cases', () => {
-    it('should close unclosed tags', () => {
-      expect(snarkdown('*foo')).to.equal('<em>foo</em>');
-      expect(snarkdown('foo**')).to.equal('foo<strong></strong>');
-      expect(snarkdown('[some **bold text](#winning)')).to.equal('<a href="#winning">some <strong>bold text</strong></a>');
-      expect(snarkdown('`foo')).to.equal('`foo');
-    });
+	describe('edge cases', () => {
+		it('should close unclosed tags', () => {
+			expect(snarkdown('*foo')).to.equal('<em>foo</em>');
+			expect(snarkdown('foo**')).to.equal('foo<strong></strong>');
+			expect(snarkdown('[some **bold text](#winning)')).to.equal('<a href="#winning">some <strong>bold text</strong></a>');
+			expect(snarkdown('`foo')).to.equal('`foo');
+		});
 
-    it('should not choke on single characters', () => {
-      expect(snarkdown('*')).to.equal('<em></em>');
-      expect(snarkdown('_')).to.equal('<em></em>');
-      expect(snarkdown('**')).to.equal('<strong></strong>');
-      expect(snarkdown('>')).to.equal('>');
-      expect(snarkdown('`')).to.equal('`');
-    });
-  });
+		it('should not choke on single characters', () => {
+			expect(snarkdown('*')).to.equal('<em></em>');
+			expect(snarkdown('_')).to.equal('<em></em>');
+			expect(snarkdown('**')).to.equal('<strong></strong>');
+			expect(snarkdown('>')).to.equal('>');
+			expect(snarkdown('`')).to.equal('`');
+		});
+	});
 
-  describe('tables', () => {
-    it('should parse content', () => {
-      expect(snarkdown('| a | hallo welt | c |')).to.equal('<table><tr><td>a</td><td>hallo welt</td><td>c</td></tr></table>');
-      expect(snarkdown('| a | b |')).to.equal('<table><tr><td>a</td><td>b</td></tr></table>');
-      expect(snarkdown('| a | b \n| c | d')).to.equal('<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>');
-      expect(snarkdown('| a | b \n| c | d \n| e | f')).to.equal('<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr><tr><td>e</td><td>f</td></tr></table>');
-      expect(snarkdown('| a')).to.equal('<table><tr><td>a</td></tr></table>');
-    });
+	describe('tables', () => {
+		it('should parse content', () => {
+			expect(snarkdown('| a | hallo welt | c |')).to.equal('<table><tr><td>a</td><td>hallo welt</td><td>c</td></tr></table>');
+			expect(snarkdown('| a | b |')).to.equal('<table><tr><td>a</td><td>b</td></tr></table>');
+			expect(snarkdown('| a | b \n| c | d')).to.equal('<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>');
+			expect(snarkdown('| a | b \n| c | d \n| e | f')).to.equal('<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr><tr><td>e</td><td>f</td></tr></table>');
+			expect(snarkdown('| a')).to.equal('<table><tr><td>a</td></tr></table>');
+		});
 
-    it('should parse header', () => {
-      expect(snarkdown('| a | hallo welt | c |\n| ---')).to.equal('<table><tr><th>a</th><th>hallo welt</th><th>c</th></tr></table>');
-      expect(snarkdown('| a | b \n| --- | --- \n| e | f')).to.equal('<table><tr><th>a</th><th>b</th></tr><tr><td>e</td><td>f</td></tr></table>');
-    });
-  });
+		it('should parse header', () => {
+			expect(snarkdown('| a | hallo welt | c |\n| ---')).to.equal('<table><tr><th>a</th><th>hallo welt</th><th>c</th></tr></table>');
+			expect(snarkdown('| a | b \n| --- | --- \n| e | f')).to.equal('<table><tr><th>a</th><th>b</th></tr><tr><td>e</td><td>f</td></tr></table>');
+		});
+	});
 });
