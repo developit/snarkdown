@@ -36,6 +36,12 @@ describe('snarkdown()', () => {
 		it('parses H3 titles', () => {
 			expect(snarkdown('### I like tiny libraries')).to.equal('<h3>I like tiny libraries</h3>');
 		});
+
+		it('parses titles with reference links', () => {
+			expect(
+				snarkdown('# I like [tiny libraries]\n\n[tiny libraries]: https://github.com/developit/snarkdown')
+			).to.equal('<h1>I like <a href="https://github.com/developit/snarkdown">tiny libraries</a></h1>');
+		});
 	});
 
 	describe('links & images', () => {
@@ -60,6 +66,10 @@ describe('snarkdown()', () => {
 		it('parses reference links', () => {
 			expect(snarkdown('\nhello [World]!\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
+
+    it('parses reference links without creating excessive linebreaks', () => {
+      expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
+    });
 	});
 
 	describe('lists', () => {
