@@ -101,10 +101,10 @@ export default function parse(md, prevLinks) {
 		}
 		// Table parser
 		else if (token[18]) {
-			var tr = (a, r) => ('<tr>' + a.split('|').reduce((b, v) => b + (v ? ('<' + r + v.trim() + '</' + r) : '')) + '</tr>'),
+			var tr = (a, r) => `<tr>${a.split(/\|\s*/).reduce((b, v) => b + (v ? `<${r+parse(v)}</${r}` : ''))}</tr>`,
 				h = token[19] ? tr(token[19], token[20] ? 'th>' : 'td>') : '',
 				c = token[21] ? token[21].split('\n').reduce((a, v) => a + (v ? tr(v, 'td>') : '')) : '';
-			chunk = '<table>' + h + c + '</table>';
+			chunk = `<table>${h+c}</table>`;
 		}
 		out += prev;
 		out += chunk;
