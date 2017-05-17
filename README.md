@@ -14,8 +14,6 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 
 ## Features
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/developit/snarkdown.svg)](https://greenkeeper.io/)
-
 - **Fast:** since it's basically one regex and a huge if statement
 - **Tiny:** it's 1kb of gzipped ES3
 - **Simple:** pass a Markdown string, get back an HTML string
