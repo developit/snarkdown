@@ -21,8 +21,8 @@ function encodeAttr(str) {
 }
 
 /** Parse Markdown into an HTML String. */
-export default function snarkdown(md, options) {
-	options = options || { highlight: s => s };
+export default function snarkdown(md, options = {}) {
+	const highlight = options.highlight;
 
 	return parse(md);
 
@@ -63,11 +63,10 @@ export default function snarkdown(md, options) {
 			}
 			// Code/Indent blocks:
 			else if (token[3] || token[4]) {
-				chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'">'+outdent(
-					options.highlight(
-						encodeAttr(token[3] || token[4]).replace(/^\n+|\n+$/g, '')
-					)
-				)+'</pre>';
+				const lang = token[4]?'poetry':token[2].toLowerCase();
+				chunk = '<pre class="code '+lang+'">'+outdent(
+					highlight ? highlight(token[3] || token[4], lang) : encodeAttr(token[3] || token[4])
+				).replace(/^\n+|\n+$/g, '')+'</pre>';
 			}
 			// > Quotes, -* lists:
 			else if (token[6]) {
