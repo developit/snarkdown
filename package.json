@@ -70,7 +70,10 @@
       "no-console": 1,
       "no-cond-assign": 0,
       "no-regex-spaces": 0,
-      "semi": [2, "always"]
+      "semi": [
+        2,
+        "always"
+      ]
     }
   }
 }
