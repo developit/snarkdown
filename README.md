@@ -42,6 +42,27 @@ console.log(html);
 // <em>this</em> is <strong>easy</strong> to <code>use</code>.
 ```
 
+### Options
+Snarkdown also accepts an optional `options` object.
+
+#### `options.highlight`
+Highlight code blocks when parsed. Accepts a function with the signature `hightlight(code, language)`. Return a highlighted string using the library or your choice.
+```javascript
+import snarkdown from 'snarkdown'
+import prism from 'prismjs'
+
+let md = `
+  \`\`\`javascript
+    let md = "I'm a code block";
+  \`\`\`
+`
+let html = snarkdown(md, {
+  highlight: (code, language) => {
+    return prism.highlight(code, prism.languages[language])
+  }
+});
+```
+
 
 ## License
 
