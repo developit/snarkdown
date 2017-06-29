@@ -51,11 +51,7 @@ Highlight code blocks when parsed. Accepts a function with the signature `hightl
 import snarkdown from 'snarkdown'
 import prism from 'prismjs'
 
-let md = `
-  \`\`\`javascript
-    let md = "I'm a code block";
-  \`\`\`
-`
+let md = '```javascript \n let md = "a javascript code block";```'
 let html = snarkdown(md, {
   highlight: (code, language) => {
     return prism.highlight(code, prism.languages[language])
