@@ -42,7 +42,7 @@
     "babel-register": "^6.23.0",
     "chai": "^3.5.0",
     "cross-env": "^3.1.4",
-    "eslint": "^3.16.1",
+    "eslint": "^4.7.2",
     "gzip-size-cli": "^2.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^3.2.0",
