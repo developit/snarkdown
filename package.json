@@ -45,7 +45,7 @@
     "eslint": "^3.16.1",
     "gzip-size-cli": "^2.0.0",
     "mkdirp": "^0.5.1",
-    "mocha": "^3.2.0",
+    "mocha": "^4.0.0",
     "npm-run-all": "^4.0.2",
     "rimraf": "^2.6.1",
     "rollup": "^0.41.4",
