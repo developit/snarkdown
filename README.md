@@ -18,10 +18,6 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 
 > **Note:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
 
-<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/WbARjbDRQz5y3N6VBEMPU4LW/developit/snarkdown'>
-  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/WbARjbDRQz5y3N6VBEMPU4LW/developit/snarkdown.svg' />
-</a>
-
 ## Demos & Examples
 
 - ⚛️ [**Snarky**](https://snarky.surge.sh) - markdown editor built with Preact & Snarkdown
