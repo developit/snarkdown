@@ -113,7 +113,7 @@ export default function parse(md, prevLinks) {
 				var c = l[i].split(/\|\s*/),
 						j = c.length,
 						tr = '';
-				while ( j-- ) {
+				while (j--) {
 					tr = (c[j] ? `<${r+parse(c[j])}</${r}` : '') + tr;
 				}
 				table = `<tr>${tr}</tr>` + table;
