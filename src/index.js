@@ -6,6 +6,10 @@ const TAGS = {
 	'-': ['<hr />']
 };
 
+/** Highlight option
+ */
+let highlight = false;
+
 /** Outdent a string based on the first indented line's leading whitespace
  *	@private
  */
@@ -21,7 +25,7 @@ function encodeAttr(str) {
 }
 
 /** Parse Markdown into an HTML String. */
-export default function parse(md, prevLinks) {
+function parse(md, prevLinks) {
 	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^```(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:\!\[([^\]]*?)\]\(([^\)]+?)\))|(\[)|(\](?:\(([^\)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(\-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,3})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*])/gm,
 		context = [],
 		out = '',
@@ -58,7 +62,9 @@ export default function parse(md, prevLinks) {
 		}
 		// Code/Indent blocks:
 		else if (token[3] || token[4]) {
-			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'">'+outdent(encodeAttr(token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</pre>';
+			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'">'+outdent(
+				highlight ? highlight(token[3] || token[4], (token[4]?'poetry':token[2].toLowerCase())) : encodeAttr(token[3] || token[4])
+			).replace(/^\n+|\n+$/g, '')+'</pre>';
 		}
 		// > Quotes, -* lists:
 		else if (token[6]) {
@@ -104,4 +110,10 @@ export default function parse(md, prevLinks) {
 	}
 
 	return (out + md.substring(last) + flush()).trim();
+}
+
+export default function snarkdown(md, opt) {
+	opt = opt || {};
+	highlight = opt.highlight;
+	return parse(md);
 }
