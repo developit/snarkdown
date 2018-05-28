@@ -1,5 +1,3 @@
-<h1 align="center">Snarkdown</h1>
-
 <p align="center">
   <img src="https://cdn.jsdelivr.net/emojione/assets/svg/1f63c.svg" width="256" height="256" alt="Snarkdown">
   <br>
@@ -18,8 +16,7 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 - **Tiny:** it's 1kb of gzipped ES3
 - **Simple:** pass a Markdown string, get back an HTML string
 
-> **Notes:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
-
+> **Note:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
 
 ## Demos & Examples
 
