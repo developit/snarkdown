@@ -36,7 +36,7 @@
     "babel-register": "^6.23.0",
     "chai": "^3.5.0",
     "eslint": "^3.16.1",
-    "microbundle": "^0.4.4",
+    "microbundle": "^0.8.4",
     "mocha": "^5.1.1"
   },
   "eslintConfig": {
