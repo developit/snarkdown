@@ -35,7 +35,7 @@
     "babel-preset-latest": "^6.22.0",
     "babel-register": "^6.23.0",
     "chai": "^3.5.0",
-    "eslint": "^3.16.1",
+    "eslint": "^6.5.0",
     "microbundle": "^0.4.4",
     "mocha": "^5.1.1"
   },
