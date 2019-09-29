@@ -37,7 +37,7 @@
     "chai": "^3.5.0",
     "eslint": "^3.16.1",
     "microbundle": "^0.4.4",
-    "mocha": "^5.1.1"
+    "mocha": "^6.2.1"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
