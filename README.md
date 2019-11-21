@@ -39,6 +39,31 @@ console.log(html);
 // <em>this</em> is <strong>easy</strong> to <code>use</code>.
 ```
 
+### With webpack
+
+Use [`snarkdown-loader`](https://github.com/Plugin-contrib/snarkdown-loader) to render your markdown files as html files
+
+`$ npm -i --save-dev snarkdown-loader html-loader`
+
+```js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /.md$/,
+        use: [
+          {
+            loader: 'html-loader', // Exports HTML as string
+          },
+          {
+            loader: `snarkdown-loader`, // converts the markdown to HTML
+          },
+        ],
+      },
+    ],
+  },
+};
+```
 
 ## License
 
