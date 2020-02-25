@@ -67,7 +67,7 @@ export default function parse(md, prevLinks) {
 			if (t.match(/\./)) {
 				token[5] = token[5].replace(/^\d+/gm, '');
 			}
-			inner = parse(outdent(token[5].replace(/^\s*[>*+.-]/gm, '')));
+			inner = parse(outdent(token[5].replace(/^\s*[>*+.-]/gm, '\n')));
 			if (t==='>') t = 'blockquote';
 			else {
 				t = t.match(/\./) ? 'ol' : 'ul';
