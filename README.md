@@ -17,6 +17,8 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 - **Simple:** pass a Markdown string, get back an HTML string
 
 > **Note:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
+>
+> **Note on XSS:** Snarkdown [doesn't sanitize HTML](https://github.com/developit/snarkdown/issues/70), since its primary target usage doesn't require it.
 
 ## Demos & Examples
 
