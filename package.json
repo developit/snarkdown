@@ -1,7 +1,7 @@
 {
   "name": "snarkdown",
   "description": "Transform Markdown into HTML.",
-  "version": "1.2.3",
+  "version": "1.2.2",
   "main": "dist/snarkdown.js",
   "module": "dist/snarkdown.es.js",
   "umd:main": "dist/snarkdown.umd.js",
