@@ -1,9 +1,12 @@
 <p align="center">
   <img src="https://cdn.jsdelivr.net/emojione/assets/svg/1f63c.svg" width="256" height="256" alt="Snarkdown">
-  <br>
-  <a href="https://www.npmjs.org/package/snarkdown"><img src="https://img.shields.io/npm/v/snarkdown.svg?style=flat" alt="npm"></a> <a href="https://travis-ci.org/developit/snarkdown"><img src="https://travis-ci.org/developit/snarkdown.svg?branch=master" alt="travis"></a>
 </p>
-
+<h1 align="center">
+  Snarkdown
+  <a href="https://www.npmjs.org/package/snarkdown">
+    <img src="https://img.shields.io/npm/v/snarkdown.svg?style=flat" alt="npm">
+  </a>
+</h1>
 
 Snarkdown is a dead simple **1kb** [Markdown] parser.
 
@@ -17,6 +20,8 @@ It's designed to be as minimal as possible, for constrained use-cases where a fu
 - **Simple:** pass a Markdown string, get back an HTML string
 
 > **Note:** Tables are not yet supported. If you love impossible to read regular expressions, submit a PR!
+>
+> **Note on XSS:** Snarkdown [doesn't sanitize HTML](https://github.com/developit/snarkdown/issues/70), since its primary target usage doesn't require it.
 
 ## Demos & Examples
 
@@ -39,10 +44,10 @@ console.log(html);
 // <em>this</em> is <strong>easy</strong> to <code>use</code>.
 ```
 
+### Add-ons and Libraries
 
-## License
+- For Webpack users, [`snarkdown-loader`](https://github.com/Plugin-contrib/snarkdown-loader) renders markdown files to html.
 
-MIT
 
 
 [Markdown]: http://daringfireball.net/projects/markdown/
