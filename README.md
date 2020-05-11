@@ -1,9 +1,12 @@
 <p align="center">
   <img src="https://cdn.jsdelivr.net/emojione/assets/svg/1f63c.svg" width="256" height="256" alt="Snarkdown">
-  <br>
-  <a href="https://www.npmjs.org/package/snarkdown"><img src="https://img.shields.io/npm/v/snarkdown.svg?style=flat" alt="npm"></a> <a href="https://travis-ci.org/developit/snarkdown"><img src="https://travis-ci.org/developit/snarkdown.svg?branch=master" alt="travis"></a>
 </p>
-
+<h1 align="center">
+  Snarkdown
+  <a href="https://www.npmjs.org/package/snarkdown">
+    <img src="https://img.shields.io/npm/v/snarkdown.svg?style=flat" alt="npm">
+  </a>
+</h1>
 
 Snarkdown is a dead simple **1kb** [Markdown] parser.
 
@@ -41,35 +44,10 @@ console.log(html);
 // <em>this</em> is <strong>easy</strong> to <code>use</code>.
 ```
 
-### With webpack
+### Add-ons and Libraries
 
-Use [`snarkdown-loader`](https://github.com/Plugin-contrib/snarkdown-loader) to render your markdown files as html files
+- For Webpack users, [`snarkdown-loader`](https://github.com/Plugin-contrib/snarkdown-loader) renders markdown files to html.
 
-`$ npm -i --save-dev snarkdown-loader html-loader`
-
-```js
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /.md$/,
-        use: [
-          {
-            loader: 'html-loader', // Exports HTML as string
-          },
-          {
-            loader: `snarkdown-loader`, // converts the markdown to HTML
-          },
-        ],
-      },
-    ],
-  },
-};
-```
-
-## License
-
-MIT
 
 
 [Markdown]: http://daringfireball.net/projects/markdown/
