@@ -67,9 +67,9 @@ describe('snarkdown()', () => {
 			expect(snarkdown('\nhello [World]!\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
 
-    it('parses reference links without creating excessive linebreaks', () => {
-      expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
-    });
+		it('parses reference links without creating excessive linebreaks', () => {
+			expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
+		});
 	});
 
 	describe('lists', () => {
@@ -165,6 +165,27 @@ describe('snarkdown()', () => {
 			expect(snarkdown('**')).to.equal('<strong></strong>');
 			expect(snarkdown('>')).to.equal('>');
 			expect(snarkdown('`')).to.equal('`');
+		});
+	});
+
+	describe('tables', () => {
+		it('should parse content', () => {
+			expect(snarkdown('| a | hallo welt | c |')).to.equal('<table><tr><td>a</td><td>hallo welt</td><td>c</td></tr></table>');
+			expect(snarkdown('| a |   b   |')).to.equal('<table><tr><td>a</td><td>b</td></tr></table>');
+			expect(snarkdown('| a | b \n| c | d')).to.equal('<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>');
+			expect(snarkdown('| a |   b    \n| c | d \n| e | f')).to.equal('<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr><tr><td>e</td><td>f</td></tr></table>');
+			expect(snarkdown('| a')).to.equal('<table><tr><td>a</td></tr></table>');
+		});
+
+		it('should parse header', () => {
+			expect(snarkdown('| a | hallo welt | c |\n| ---')).to.equal('<table><tr><th>a</th><th>hallo welt</th><th>c</th></tr></table>');
+			expect(snarkdown('| a | b \n| --- | --- \n| e | f')).to.equal('<table><tr><th>a</th><th>b</th></tr><tr><td>e</td><td>f</td></tr></table>');
+		});
+
+		it('should allow inline styles', () => {
+			expect(snarkdown('| [Example](#example) | **strong** |')).to.equal('<table><tr><td><a href="#example">Example</a></td><td><strong>strong</strong></td></tr></table>');
+			expect(snarkdown('| a | # hallo welt | c |\n| ---')).to.equal('<table><tr><th>a</th><th><h1>hallo welt</h1></th><th>c</th></tr></table>');
+			expect(snarkdown('|   [some **bold text](#winning)  | b \n| --- | --- \n| > To be or not to be | f')).to.equal('<table><tr><th><a href="#winning">some <strong>bold text</strong></a></th><th>b</th></tr><tr><td><blockquote>To be or not to be</blockquote></td><td>f</td></tr></table>');
 		});
 	});
 });
