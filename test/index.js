@@ -114,18 +114,18 @@ describe('snarkdown()', () => {
 		});
 
 		it('parses three backtricks (```) as a code block', () => {
-			expect(snarkdown('```\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code ">function codeBlocks() {\n\treturn &quot;Can be inserted&quot;;\n}</pre>');
+			expect(snarkdown('```\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code "><code>function codeBlocks() {\n\treturn &quot;Can be inserted&quot;;\n}</code></pre>');
 
-			expect(snarkdown('```js\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code js">function codeBlocks() {\n\treturn &quot;Can be inserted&quot;;\n}</pre>');
+			expect(snarkdown('```js\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code js language-js"><code>function codeBlocks() {\n\treturn &quot;Can be inserted&quot;;\n}</code></pre>');
 		});
 
 		it('parses tabs as a code poetry block', () => {
-			expect(snarkdown('\tvar a = 1')).to.equal('<pre class="code poetry">var a = 1</pre>');
+			expect(snarkdown('\tvar a = 1')).to.equal('<pre class="code poetry"><code>var a = 1</code></pre>');
 		});
 
 		it('escapes code/quote blocks', () => {
-			expect(snarkdown('```\n<foo>\n```')).to.equal('<pre class="code ">&lt;foo&gt;</pre>');
-			expect(snarkdown('\t<foo>')).to.equal('<pre class="code poetry">&lt;foo&gt;</pre>');
+			expect(snarkdown('```\n<foo>\n```')).to.equal('<pre class="code "><code>&lt;foo&gt;</code></pre>');
+			expect(snarkdown('\t<foo>')).to.equal('<pre class="code poetry"><code>&lt;foo&gt;</code></pre>');
 		});
 
 		it('parses a block quote', () => {
