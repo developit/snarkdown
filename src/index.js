@@ -59,7 +59,7 @@ export default function parse(md, prevLinks) {
 		}
 		// Code/Indent blocks:
 		else if (token[3] || token[4]) {
-			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+(token[2] ? ` language-${token[2].toLowerCase()}` : '')+'"><code>'+outdent(encodeAttr(token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</code></pre>';
+			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'"><code'+(token[2] ? ` class="language-${token[2].toLowerCase()}"` : '')+'>'+outdent(encodeAttr(token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</code></pre>';
 		}
 		// > Quotes, -* lists:
 		else if (token[6]) {
