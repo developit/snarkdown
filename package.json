@@ -18,7 +18,8 @@
   ],
   "files": [
     "src",
-    "dist"
+    "dist",
+    "snarkdown.d.ts"
   ],
   "homepage": "https://github.com/developit/snarkdown",
   "repository": "developit/snarkdown",
