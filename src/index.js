@@ -1,6 +1,7 @@
 const TAGS = {
 	'' : ['<em>','</em>'],
 	_ : ['<strong>','</strong>'],
+	'*' : ['<strong>','</strong>'],
 	'~' : ['<s>','</s>'],
 	'\n' : ['<br />'],
 	' ' : ['<br />'],
@@ -31,11 +32,12 @@ export default function parse(md, prevLinks) {
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
-		var desc = TAGS[token.replace(/\*/g,'_')[1] || ''],
-			end = context[context.length-1]==token;
+		let desc = TAGS[token[1] || ''];
+		let end = context[context.length-1] == token;
 		if (!desc) return token;
 		if (!desc[1]) return desc[0];
-		context[end?'pop':'push'](token);
+		if (end) context.pop();
+		else context.push(token);
 		return desc[end|0];
 	}
 
@@ -58,17 +60,16 @@ export default function parse(md, prevLinks) {
 			// escaped
 		}
 		// Code/Indent blocks:
-		else if (token[3] || token[4]) {
-			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'"><code'+(token[2] ? ` class="language-${token[2].toLowerCase()}"` : '')+'>'+outdent(encodeAttr(token[3] || token[4]).replace(/^\n+|\n+$/g, ''))+'</code></pre>';
+		else if (t = (token[3] || token[4])) {
+			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'"><code'+(token[2] ? ` class="language-${token[2].toLowerCase()}"` : '')+'>'+outdent(encodeAttr(t).replace(/^\n+|\n+$/g, ''))+'</code></pre>';
 		}
 		// > Quotes, -* lists:
-		else if (token[6]) {
-			t = token[6];
+		else if (t = token[6]) {
 			if (t.match(/\./)) {
 				token[5] = token[5].replace(/^\d+/gm, '');
 			}
 			inner = parse(outdent(token[5].replace(/^\s*[>*+.-]/gm, '')));
-			if (t==='>') t = 'blockquote';
+			if (t=='>') t = 'blockquote';
 			else {
 				t = t.match(/\./) ? 'ol' : 'ul';
 				inner = inner.replace(/^(.*)(\n|$)/gm, '<li>$1</li>');
@@ -89,7 +90,7 @@ export default function parse(md, prevLinks) {
 		}
 		// Headings:
 		else if (token[12] || token[14]) {
-			t = 'h' + (token[14] ? token[14].length : (token[13][0]==='='?1:2));
+			t = 'h' + (token[14] ? token[14].length : (token[13]>'=' ? 1 : 2));
 			chunk = '<'+t+'>' + parse(token[12] || token[15], links) + '</'+t+'>';
 		}
 		// `code`:
@@ -104,5 +105,5 @@ export default function parse(md, prevLinks) {
 		out += chunk;
 	}
 
-	return (out + md.substring(last) + flush()).trim();
+	return (out + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
 }
