@@ -2,14 +2,15 @@
   "name": "snarkdown",
   "description": "Transform Markdown into HTML.",
   "version": "1.2.2",
-  "main": "dist/snarkdown.js",
-  "module": "dist/snarkdown.es.js",
-  "umd:main": "dist/snarkdown.umd.js",
-  "types": "snarkdown.d.ts",
+  "main": "./dist/snarkdown.js",
+  "module": "./dist/snarkdown.es.js",
+  "modern": "./dist/snarkdown.modern.js",
+  "umd:main": "./dist/snarkdown.umd.js",
+  "types": "./snarkdown.d.ts",
   "scripts": {
     "build": "microbundle",
     "dev": "microbundle watch",
-    "test": "eslint src test && mocha --compilers babel-register",
+    "test": "eslint src test && NODE_ENV=test mocha --compilers @babel/register",
     "prepublish": "npm run -s build",
     "release": "npm run -s build && npm test && git commit -am $npm_package_version && git tag $npm_package_version && git push && git push --tags && npm publish"
   },
@@ -30,22 +31,18 @@
     "html",
     "parser"
   ],
-  "dependencies": {},
   "devDependencies": {
-    "babel-core": "^6.23.1",
-    "babel-preset-latest": "^6.22.0",
-    "babel-register": "^6.23.0",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/register": "^7.11.5",
     "chai": "^3.5.0",
-    "eslint": "^3.16.1",
+    "eslint": "^7.7.0",
+    "eslint-config-developit": "^1.2.0",
     "microbundle": "^0.12.0",
     "mocha": "^5.1.1",
     "npm-merge-driver-install": "^1.1.1"
   },
   "eslintConfig": {
-    "extends": "eslint:recommended",
-    "parserOptions": {
-      "sourceType": "module"
-    },
+    "extends": "developit",
     "env": {
       "browser": true,
       "mocha": true,
@@ -56,13 +53,19 @@
       "expect": true
     },
     "rules": {
+      "jest/valid-expect": 0,
       "no-console": 1,
       "no-cond-assign": 0,
-      "no-regex-spaces": 0,
-      "semi": [
-        2,
-        "always"
-      ]
+      "no-regex-spaces": 0
+    }
+  },
+  "babel": {
+    "env": {
+      "test": {
+        "presets": [
+          "@babel/preset-env"
+        ]
+      }
     }
   }
 }
