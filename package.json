@@ -6,6 +6,7 @@
   "module": "./dist/snarkdown.es.js",
   "modern": "./dist/snarkdown.modern.js",
   "umd:main": "./dist/snarkdown.umd.js",
+  "unpkg": "./dist/snarkdown.umd.js",
   "types": "./snarkdown.d.ts",
   "scripts": {
     "build": "microbundle",
