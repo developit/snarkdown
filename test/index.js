@@ -49,6 +49,10 @@ describe('snarkdown()', () => {
 			expect(snarkdown('[Snarkdown](http://github.com/developit/snarkdown)')).to.equal('<a href="http://github.com/developit/snarkdown">Snarkdown</a>');
 		});
 
+		it('parses link by angle bracket syntax', () => {
+			expect(snarkdown('<https://github.com>')).to.equal('<a href="https://github.com">https://github.com</a>');
+		});
+
 		it('parses anchor links', () => {
 			expect(snarkdown('[Example](#example)')).to.equal('<a href="#example">Example</a>');
 		});
