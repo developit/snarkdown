@@ -156,6 +156,10 @@ describe('snarkdown()', () => {
 			expect(snarkdown('<div title="I **don\'t** parse"></div>')).to.equal('<div title="I **don\'t** parse"></div>');
 			expect(snarkdown('<a class="_b" target="_blank">a</a>')).to.equal('<a class="_b" target="_blank">a</a>');
 		});
+
+		it('should parse outside HTML tags', () => {
+			expect(snarkdown('<a>**a**</a>')).to.equal('<a><strong>a</strong></a>');
+		});
 	});
 
 	describe('edge cases', () => {
