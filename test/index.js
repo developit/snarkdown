@@ -18,6 +18,13 @@ describe('snarkdown()', () => {
 		it('parses italics with _', () => {
 			expect(snarkdown('I _like_ tiny libraries')).to.equal('I <em>like</em> tiny libraries');
 		});
+
+		it('ignores words with special formatting', () => {
+			expect(snarkdown('I like tiny*libraries')).to.equal('I like tiny*libraries');
+			expect(snarkdown('I like tiny_libraries')).to.equal('I like tiny_libraries');
+			expect(snarkdown('I like tiny**libraries')).to.equal('I like tiny**libraries');
+			expect(snarkdown('I like tiny__libraries')).to.equal('I like tiny__libraries');
+		});
 	});
 
 	describe('titles', () => {
