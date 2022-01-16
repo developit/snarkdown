@@ -3,6 +3,10 @@ import snarkdown from '../src';
 
 describe('snarkdown()', () => {
 	describe('text formatting', () => {
+		it('parses strikethrough with ~~', () => {
+			expect(snarkdown('I ~~like~~ tiny libraries')).to.equal('I <s>like</s> tiny libraries');
+		});
+
 		it('parses bold with **', () => {
 			expect(snarkdown('I **like** tiny libraries')).to.equal('I <strong>like</strong> tiny libraries');
 		});
