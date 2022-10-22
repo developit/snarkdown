@@ -91,7 +91,7 @@ export default function parse(md, prevLinks) {
 		// Headings:
 		else if (token[12] || token[14]) {
 			t = 'h' + (token[14] ? token[14].length : (token[13]>'=' ? 1 : 2));
-			chunk = '<'+t+'>' + parse(token[12] || token[15], links) + '</'+t+'>';
+			chunk = '<'+t+' id="'+ parse(token[12] || token[15]).replace(" ","-").toLowerCase() +'">' + parse(token[12] || token[15], links) + '</'+t+'>';
 		}
 		// `code`:
 		else if (token[16]) {
