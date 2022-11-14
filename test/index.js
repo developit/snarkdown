@@ -167,4 +167,21 @@ describe('snarkdown()', () => {
 			expect(snarkdown('`')).to.equal('`');
 		});
 	});
+
+	describe('escaping', () => {
+		it('should escape special charcters', () => {
+			expect(snarkdown('\\*foo')).to.equal('*foo');
+			expect(snarkdown('this\\*is\\*important')).to.equal('this*is*important');
+			expect(snarkdown('\\_foo')).to.equal('_foo');
+			expect(snarkdown('\\[foo')).to.equal('[foo');
+			expect(snarkdown('\\]foo')).to.equal(']foo');
+			expect(snarkdown('\\(foo')).to.equal('(foo');
+			expect(snarkdown('\\)foo')).to.equal(')foo');
+			expect(snarkdown('\\{foo')).to.equal('{foo');
+			expect(snarkdown('\\}foo')).to.equal('}foo');
+			expect(snarkdown('\\-foo')).to.equal('-foo');
+			expect(snarkdown('\\+foo')).to.equal('+foo');
+			expect(snarkdown('\\#foo')).to.equal('#foo');
+		});
+	});
 });

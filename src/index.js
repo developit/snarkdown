@@ -30,6 +30,8 @@ export default function parse(md, prevLinks) {
 		links = prevLinks || {},
 		last = 0,
 		chunk, prev, token, inner, t;
+	// escape special characters
+	md = md.replace(/\\([*_[\]{}`<>()#+\-!|.])/g, m => `&%${m.charCodeAt(1)}%;`);
 
 	function tag(token) {
 		let desc = TAGS[token[1] || ''];
@@ -105,5 +107,14 @@ export default function parse(md, prevLinks) {
 		out += chunk;
 	}
 
-	return (out + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
+	return (
+		out +
+		md
+			.substring(last)
+			// unscape special characters
+			.replace(/&%[0-9]+%;/g, (m) =>
+				String.fromCharCode(+m.substring(2, m.length - 2))
+			) +
+		flush()
+	).replace(/^\n+|\n+$/g, '');
 }
