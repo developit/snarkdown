@@ -92,6 +92,14 @@ describe('snarkdown()', () => {
 		it('parses an ordered list', () => {
 			expect(snarkdown('1. Ordered\n2. Lists\n4. Numbers are ignored')).to.equal('<ol><li>Ordered</li><li>Lists</li><li>Numbers are ignored</li></ol>');
 		});
+
+		it('parses nested lists', () => {
+			expect(snarkdown('* One\n\t* Two\n* One again')).to.equal('<ul><li>One<ul><li>Two</li></ul></li><li>One again</li></ul>');
+		});
+
+		it('parses nested lists of different types', () => {
+			expect(snarkdown('* One\n\t1. Two\n* One again')).to.equal('<ul><li>One<ol><li>Two</li></ol></li><li>One again</li></ul>');
+		});
 	});
 
 	describe('line breaks', () => {
@@ -133,7 +141,7 @@ describe('snarkdown()', () => {
 		});
 
 		it('parses lists within block quotes', () => {
-			expect(snarkdown('> - one\n> - two\n> - **three**\nhello')).to.equal('<blockquote><ul><li>one</li><li>two</li><li><strong>three</strong></li></ul></blockquote>\nhello');
+			expect(snarkdown('> - one\n> - two\n> - **three**\nhello')).to.equal('<blockquote><ul><li>one</li><li>two</li><li><strong>three</strong></li></ul></blockquote>hello');
 		});
 	});
 
