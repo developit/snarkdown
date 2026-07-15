@@ -24,7 +24,7 @@ function encodeAttr(str) {
 
 /** Parse Markdown into an HTML String. */
 export default function parse(md, prevLinks) {
-	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
+	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)|((?:(?:^|\n)\|.+)+)/gm,
 		context = [],
 		out = '',
 		links = prevLinks || {},
@@ -100,6 +100,15 @@ export default function parse(md, prevLinks) {
 		// Inline formatting: *em*, **strong** & friends
 		else if (token[17] || token[1]) {
 			chunk = tag(token[17] || '--');
+		}
+		// Tables:
+		else if (token[18]) {
+			t = token[18].trim().split('\n').map(row => row.replace(/^\s*\|\s*|\s*\|\s*$/g, '').split(/\s*\|\s*/));
+			inner = t[1] && t[1].every(cell => /^:?-+:?$/.test(cell)) ? t.splice(1, 1) && 'th' : 'td';
+			chunk = '<table>' + t.map((row, i) => {
+				let cell = i ? 'td' : inner;
+				return '<tr>' + row.map(str => '<'+cell+'>' + parse(str, links) + '</'+cell+'>').join('') + '</tr>';
+			}).join('') + '</table>';
 		}
 		out += prev;
 		out += chunk;

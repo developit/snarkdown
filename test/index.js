@@ -151,6 +151,24 @@ describe('snarkdown()', () => {
 		});
 	});
 
+	describe('tables', () => {
+		it('parses a table with a header', () => {
+			expect(snarkdown('| a | b |\n| --- | --- |\n| 1 | 2 |')).to.equal('<table><tr><th>a</th><th>b</th></tr><tr><td>1</td><td>2</td></tr></table>');
+		});
+
+		it('parses a table without a header', () => {
+			expect(snarkdown('| 1 | 2 |\n| 3 | 4 |')).to.equal('<table><tr><td>1</td><td>2</td></tr><tr><td>3</td><td>4</td></tr></table>');
+		});
+
+		it('parses inline formatting within cells', () => {
+			expect(snarkdown('| **a** | [b](#b) |\n| --- | --- |\n| `c` | d |')).to.equal('<table><tr><th><strong>a</strong></th><th><a href="#b">b</a></th></tr><tr><td><code>c</code></td><td>d</td></tr></table>');
+		});
+
+		it('parses a table surrounded by text', () => {
+			expect(snarkdown('before\n\n| a |\n| --- |\n| 1 |\n\nafter')).to.equal('before<br /><table><tr><th>a</th></tr><tr><td>1</td></tr></table><br />after');
+		});
+	});
+
 	describe('edge cases', () => {
 		it('should close unclosed tags', () => {
 			expect(snarkdown('*foo')).to.equal('<em>foo</em>');
