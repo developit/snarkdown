@@ -29,6 +29,15 @@ export default function parse(md, prevLinks) {
 		out = '',
 		links = prevLinks || {},
 		last = 0,
+		// Link hrefs are resolved in a single final pass instead of rewriting the
+		// whole output on every closing `]` (previously O(n^2) on link-heavy input).
+		// `linkOpens` records the offset of every `<a>` marker as output is
+		// appended; `linkPtr` consumes them left-to-right, preserving the original
+		// "first unresolved `<a>` wins" semantics. Offsets stay valid because we
+		// only ever append to `out`.
+		linkOpens = [],
+		linkPtr = 0,
+		linkEdits = null,
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
@@ -45,6 +54,16 @@ export default function parse(md, prevLinks) {
 		let str = '';
 		while (context.length) str += tag(context[context.length-1]);
 		return str;
+	}
+
+	// Append to `out`, recording the offset of every `<a>` link marker so hrefs
+	// can be filled in one final pass. Generated chunks never start with `>` nor
+	// end with `<a`, so no `<a>` can straddle an append boundary.
+	function emit(str) {
+		for (let k = str.indexOf('<a>'); k !== -1; k = str.indexOf('<a>', k + 1)) {
+			linkOpens.push(out.length + k);
+		}
+		out += str;
 	}
 
 	md = md.replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
@@ -82,7 +101,9 @@ export default function parse(md, prevLinks) {
 		}
 		// Links:
 		else if (token[10]) {
-			out = out.replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`);
+			if (linkPtr < linkOpens.length) {
+				(linkEdits || (linkEdits = [])).push([linkOpens[linkPtr++], `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`]);
+			}
 			chunk = flush() + '</a>';
 		}
 		else if (token[9]) {
@@ -101,8 +122,18 @@ export default function parse(md, prevLinks) {
 		else if (token[17] || token[1]) {
 			chunk = tag(token[17] || '--');
 		}
-		out += prev;
-		out += chunk;
+		emit(prev);
+		emit(chunk);
+	}
+
+	// Fill in the deferred link hrefs in one left-to-right pass.
+	if (linkEdits) {
+		let merged = '', pos = 0;
+		for (let edit of linkEdits) {
+			merged += out.slice(pos, edit[0]) + edit[1];
+			pos = edit[0] + 3;
+		}
+		out = merged + out.slice(pos);
 	}
 
 	return (out + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
