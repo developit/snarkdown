@@ -70,6 +70,17 @@ describe('snarkdown()', () => {
 		it('parses reference links without creating excessive linebreaks', () => {
 			expect(snarkdown('\nhello [World]!\n\n[world]: http://world.com')).to.equal('hello <a href="http://world.com">World</a>!');
 		});
+
+		it('renders brackets literally when there is no URL', () => {
+			// #105: "[text]" with no inline URL and no reference
+			// definition used to render as <a href="undefined">.
+			expect(snarkdown('mSrc [, options ])')).to.equal('mSrc [, options ])');
+			expect(snarkdown('[missing]')).to.equal('[missing]');
+			expect(snarkdown('[x]()')).to.equal('[x]()');
+			expect(snarkdown('[a [b] c]')).to.equal('[a [b] c]');
+			expect(snarkdown('[ok](http://x.com) and [nope]')).to.equal('<a href="http://x.com">ok</a> and [nope]');
+			expect(snarkdown('[nope] and [ok](http://x.com)')).to.equal('[nope] and <a href="http://x.com">ok</a>');
+		});
 	});
 
 	describe('lists', () => {
