@@ -37,6 +37,16 @@ describe('snarkdown()', () => {
 			expect(snarkdown('### I like tiny libraries')).to.equal('<h3>I like tiny libraries</h3>');
 		});
 
+		it('requires a space after the hashes', () => {
+			// #64: "#sth" is plain text (e.g. a hashtag), not a heading.
+			expect(snarkdown('#sth')).to.equal('#sth');
+			expect(snarkdown('##sth')).to.equal('##sth');
+			expect(snarkdown('####### seven')).to.equal('####### seven');
+			expect(snarkdown('#\nfoo')).to.equal('#\nfoo');
+			// a tab counts as the required whitespace, too:
+			expect(snarkdown('#\ttitle')).to.equal('<h1>title</h1>');
+		});
+
 		it('parses titles with reference links', () => {
 			expect(
 				snarkdown('# I like [tiny libraries]\n\n[tiny libraries]: https://github.com/developit/snarkdown')
@@ -142,6 +152,22 @@ describe('snarkdown()', () => {
 			expect(snarkdown('foo\n\n---\nbar')).to.equal('foo<hr />bar');
 			expect(snarkdown('foo\n\n----\nbar'), '----').to.equal('foo<hr />bar');
 			expect(snarkdown('> foo\n\n---\nbar')).to.equal('<blockquote>foo</blockquote><hr />bar');
+		});
+
+		it('should parse --- after a heading', () => {
+			// #112: the heading swallows the blank line that follows it,
+			// which used to leave the rule without the blank line it needs.
+			expect(snarkdown('### Title\n\n---\n\ntext')).to.equal('<h3>Title</h3><hr />\ntext');
+			expect(snarkdown('---\n\nhello'), 'at the start of a document').to.equal('<hr />\nhello');
+			expect(snarkdown('foo\n\n---'), 'at the end of a document').to.equal('foo<br /><hr />');
+		});
+
+		it('should parse --- after an indented code block', () => {
+			// #103: same cause as above, with an indented code block
+			// swallowing the blank line before the rule.
+			expect(
+				snarkdown('Text into\n\n---\n\nBut, not this\n\n    Sample Code Block\n\n---\n\ntest')
+			).to.equal('Text into<hr />\nBut, not this<pre class="code poetry"><code>Sample Code Block</code></pre><hr />\ntest');
 		});
 
 		it('should parse * * *', () => {
