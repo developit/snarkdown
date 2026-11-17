@@ -37,6 +37,17 @@ describe('snarkdown()', () => {
 			expect(snarkdown('### I like tiny libraries')).to.equal('<h3>I like tiny libraries</h3>');
 		});
 
+		it('does not parse numbers in titles as lists', () => {
+			expect(snarkdown('### 1. Agreement')).to.equal('<h3>1. Agreement</h3>');
+			expect(snarkdown('### 2. Rights')).to.equal('<h3>2. Rights</h3>');
+			expect(snarkdown('### 1. **Agreement**')).to.equal('<h3>1. <strong>Agreement</strong></h3>');
+		});
+
+		it('does not parse list or quote markers in titles as blocks', () => {
+			expect(snarkdown('### - item')).to.equal('<h3>- item</h3>');
+			expect(snarkdown('### > quote')).to.equal('<h3>> quote</h3>');
+		});
+
 		it('parses titles with reference links', () => {
 			expect(
 				snarkdown('# I like [tiny libraries]\n\n[tiny libraries]: https://github.com/developit/snarkdown')
