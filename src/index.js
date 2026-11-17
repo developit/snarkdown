@@ -22,8 +22,11 @@ function encodeAttr(str) {
 	return (str+'').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-/** Parse Markdown into an HTML String. */
-export default function parse(md, prevLinks) {
+/** Parse Markdown into an HTML String.
+ *	@param {boolean} [inline] only parse inline formatting, no block constructs
+ *	(used for heading contents, which can't contain blocks)
+ */
+export default function parse(md, prevLinks, inline) {
 	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
 		context = [],
 		out = '',
@@ -60,21 +63,28 @@ export default function parse(md, prevLinks) {
 			// escaped
 		}
 		// Code/Indent blocks:
-		else if (t = (token[3] || token[4])) {
+		else if (!inline && (t = (token[3] || token[4]))) {
 			chunk = '<pre class="code '+(token[4]?'poetry':token[2].toLowerCase())+'"><code'+(token[2] ? ` class="language-${token[2].toLowerCase()}"` : '')+'>'+outdent(encodeAttr(t).replace(/^\n+|\n+$/g, ''))+'</code></pre>';
 		}
 		// > Quotes, -* lists:
 		else if (t = token[6]) {
-			if (t.match(/\./)) {
-				token[5] = token[5].replace(/^\d+/gm, '');
+			if (inline) {
+				// a list/quote marker inside a heading is literal text, not a block:
+				// keep the marker and parse only the rest inline (#115)
+				chunk = token[5].replace(/^(\s*(?:[>*+-]|\d+\.)\s+)([\s\S]*)$/, (s, marker, rest) => marker + parse(rest, links, inline));
 			}
-			inner = parse(outdent(token[5].replace(/^\s*[>*+.-]/gm, '')));
-			if (t=='>') t = 'blockquote';
 			else {
-				t = t.match(/\./) ? 'ol' : 'ul';
-				inner = inner.replace(/^(.*)(\n|$)/gm, '<li>$1</li>');
+				if (t.match(/\./)) {
+					token[5] = token[5].replace(/^\d+/gm, '');
+				}
+				inner = parse(outdent(token[5].replace(/^\s*[>*+.-]/gm, '')));
+				if (t=='>') t = 'blockquote';
+				else {
+					t = t.match(/\./) ? 'ol' : 'ul';
+					inner = inner.replace(/^(.*)(\n|$)/gm, '<li>$1</li>');
+				}
+				chunk = '<'+t+'>' + inner + '</'+t+'>';
 			}
-			chunk = '<'+t+'>' + inner + '</'+t+'>';
 		}
 		// Images:
 		else if (token[8]) {
@@ -89,9 +99,9 @@ export default function parse(md, prevLinks) {
 			chunk = '<a>';
 		}
 		// Headings:
-		else if (token[12] || token[14]) {
+		else if (!inline && (token[12] || token[14])) {
 			t = 'h' + (token[14] ? token[14].length : (token[13]>'=' ? 1 : 2));
-			chunk = '<'+t+'>' + parse(token[12] || token[15], links) + '</'+t+'>';
+			chunk = '<'+t+'>' + parse(token[12] || token[15], links, true) + '</'+t+'>';
 		}
 		// `code`:
 		else if (token[16]) {
