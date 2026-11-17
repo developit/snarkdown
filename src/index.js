@@ -82,8 +82,18 @@ export default function parse(md, prevLinks) {
 		}
 		// Links:
 		else if (token[10]) {
-			out = out.replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`);
-			chunk = flush() + '</a>';
+			let href = token[11] || links[prev.toLowerCase()];
+			if (href) {
+				out = out.replace('<a>', `<a href="${encodeAttr(href)}">`);
+				chunk = flush() + '</a>';
+			}
+			else {
+				// No URL (inline or reference): this is not a link,
+				// render the brackets literally instead of href="undefined".
+				let i = out.lastIndexOf('<a>');
+				if (~i) out = out.slice(0, i) + '[' + out.slice(i+3);
+				chunk = ']';
+			}
 		}
 		else if (token[9]) {
 			chunk = '<a>';
