@@ -119,6 +119,13 @@ describe('snarkdown()', () => {
 			expect(snarkdown('```js\nfunction codeBlocks() {\n\treturn "Can be inserted";\n}\n```')).to.equal('<pre class="code js"><code class="language-js">function codeBlocks() {\n\treturn &quot;Can be inserted&quot;;\n}</code></pre>');
 		});
 
+		it('parses fenced code blocks with spaces around the language (fixes #62)', () => {
+			expect(snarkdown('```js \ncode\n```')).to.equal('<pre class="code js"><code class="language-js">code</code></pre>');
+			expect(snarkdown('``` js \ncode\n```')).to.equal('<pre class="code js"><code class="language-js">code</code></pre>');
+			expect(snarkdown('```js\t\ncode\n```')).to.equal('<pre class="code js"><code class="language-js">code</code></pre>');
+			expect(snarkdown('``` \ncode\n```')).to.equal('<pre class="code "><code>code</code></pre>');
+		});
+
 		it('parses tabs as a code poetry block', () => {
 			expect(snarkdown('\tvar a = 1')).to.equal('<pre class="code poetry"><code>var a = 1</code></pre>');
 		});
