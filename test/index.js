@@ -102,6 +102,12 @@ describe('snarkdown()', () => {
 		it('parses two spaces as a line break', () => {
 			expect(snarkdown('Something with  \na line break')).to.equal('Something with<br />a line break');
 		});
+
+		it('parses CRLF line endings like LF line endings (fixes #69)', () => {
+			expect(snarkdown('Something with\r\n\r\na line break')).to.equal('Something with<br />a line break');
+			expect(snarkdown('Something with\r\ra line break')).to.equal('Something with<br />a line break');
+			expect(snarkdown('# Title\r\n\r\ntext')).to.equal('<h1>Title</h1>text');
+		});
 	});
 
 	describe('code & quotes', () => {

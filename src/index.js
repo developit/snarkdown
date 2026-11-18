@@ -47,7 +47,7 @@ export default function parse(md, prevLinks) {
 		return str;
 	}
 
-	md = md.replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
+	md = md.replace(/\r\n?/g, '\n').replace(/^\[(.+?)\]:\s*(.+)$/gm, (s, name, url) => {
 		links[name.toLowerCase()] = url;
 		return '';
 	}).replace(/^\n+|\n+$/g, '');
