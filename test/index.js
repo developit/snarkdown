@@ -42,6 +42,17 @@ describe('snarkdown()', () => {
 			expect(snarkdown('__bold___italic_ normal')).to.equal('<strong>bold</strong><em>italic</em> normal');
 		});
 
+		it('preserves adjacent bold spans separated by four delimiters', () => {
+			expect(snarkdown('**first****second** plain')).to.equal('<strong>first</strong><strong>second</strong> plain');
+			expect(snarkdown('__first____second__ plain')).to.equal('<strong>first</strong><strong>second</strong> plain');
+		});
+
+		it('does not treat the end of a longer run as a triple delimiter', () => {
+			const expected = '<strong>first</strong><strong><em>second</em> end</strong> plain';
+			expect(snarkdown('**first*****second* end** plain')).to.equal(expected);
+			expect(snarkdown('__first_____second_ end__ plain')).to.equal(expected);
+		});
+
 		it('closes partial triple runs before punctuation', () => {
 			expect(snarkdown('***bold*, italic** normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');
 			expect(snarkdown('___bold_, italic__ normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');

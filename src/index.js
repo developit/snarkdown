@@ -96,8 +96,16 @@ export default function parse(md, prevLinks) {
 
 	while ( (token=tokenizer.exec(md)) ) {
 		prev = md.substring(last, token.index);
-		last = tokenizer.lastIndex;
 		chunk = token[0];
+		if (token[17] === '***' || token[17] === '___') {
+			let marker = chunk[0];
+			if (md.charAt(token.index-1) === marker || md.charAt(tokenizer.lastIndex) === marker) {
+				// Preserve the original double delimiters in runs longer than three.
+				chunk = token[17] = chunk.slice(0, 2);
+				tokenizer.lastIndex--;
+			}
+		}
+		last = tokenizer.lastIndex;
 		if (prev.match(/[^\\](\\\\)*\\$/)) {
 			// escaped
 		}
