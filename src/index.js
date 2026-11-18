@@ -32,12 +32,43 @@ export default function parse(md, prevLinks) {
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
-		// `***` / `___` is a combined <em><strong> pair, not two separate toggles:
+		// `***` / `___` is a combined <em><strong> pair, not two separate toggles.
+		// A triple run also closes a single+double pair that is already open
+		// (`*italic **bold***` / `**bold *italic***`), and a single/double run
+		// closes just its half of an open triple pair when it cannot open a
+		// nested run (followed by whitespace or end of input).
 		if (token === '***' || token === '___') {
-			let end = context[context.length-1] == token;
-			if (end) context.pop();
-			else context.push(token);
-			return end ? '</strong></em>' : '<em><strong>';
+			let top = context[context.length-1], second = context[context.length-2];
+			if (top === token) {
+				context.pop();
+				return '</strong></em>';
+			}
+			let single = token[0], dbl = single + single;
+			if (top === dbl && second === single) {
+				context.pop(); context.pop();
+				return '</strong></em>';
+			}
+			if (top === single && second === dbl) {
+				context.pop(); context.pop();
+				return '</em></strong>';
+			}
+			context.push(token);
+			return '<em><strong>';
+		}
+		// Single/double run against an open triple pair of the same marker:
+		let top = context[context.length-1];
+		if ((top === '***' || top === '___') && token[0] === top[0]) {
+			let next = md[tokenizer.lastIndex];
+			if (next === undefined || /\s/.test(next)) {
+				if (token.length === 1) {
+					context[context.length-1] = top[0] + top[0];
+					return '</em>';
+				}
+				if (token.length === 2) {
+					context[context.length-1] = top[0];
+					return '</strong>';
+				}
+			}
 		}
 		let desc = TAGS[token[1] || ''];
 		let end = context[context.length-1] == token;

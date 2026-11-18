@@ -26,6 +26,14 @@ describe('snarkdown()', () => {
 		it('parses nested bold+italic with ___', () => {
 			expect(snarkdown('I ___like___ tiny libraries')).to.equal('I <em><strong>like</strong></em> tiny libraries');
 		});
+
+		it('closes an open single+double pair with ***', () => {
+			expect(snarkdown('*italic **bold*** normal')).to.equal('<em>italic <strong>bold</strong></em> normal');
+		});
+
+		it('closes each half of *** with single and double runs', () => {
+			expect(snarkdown('***bold* italic** normal')).to.equal('<em><strong>bold</em> italic</strong> normal');
+		});
 	});
 
 	describe('titles', () => {
