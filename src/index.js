@@ -24,7 +24,7 @@ function encodeAttr(str) {
 
 /** Parse Markdown into an HTML String. */
 export default function parse(md, prevLinks) {
-	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
+	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|___|\*\*\*|__|\*\*|[_*]|~~)/gm,
 		context = [],
 		out = '',
 		links = prevLinks || {},
@@ -32,6 +32,13 @@ export default function parse(md, prevLinks) {
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
+		// `***` / `___` is a combined <em><strong> pair, not two separate toggles:
+		if (token === '***' || token === '___') {
+			let end = context[context.length-1] == token;
+			if (end) context.pop();
+			else context.push(token);
+			return end ? '</strong></em>' : '<em><strong>';
+		}
 		let desc = TAGS[token[1] || ''];
 		let end = context[context.length-1] == token;
 		if (!desc) return token;

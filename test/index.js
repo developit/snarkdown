@@ -18,6 +18,14 @@ describe('snarkdown()', () => {
 		it('parses italics with _', () => {
 			expect(snarkdown('I _like_ tiny libraries')).to.equal('I <em>like</em> tiny libraries');
 		});
+
+		it('parses nested bold+italic with ***', () => {
+			expect(snarkdown('I ***like*** tiny libraries')).to.equal('I <em><strong>like</strong></em> tiny libraries');
+		});
+
+		it('parses nested bold+italic with ___', () => {
+			expect(snarkdown('I ___like___ tiny libraries')).to.equal('I <em><strong>like</strong></em> tiny libraries');
+		});
 	});
 
 	describe('titles', () => {
