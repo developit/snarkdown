@@ -32,7 +32,27 @@ describe('snarkdown()', () => {
 		});
 
 		it('closes each half of *** with single and double runs', () => {
-			expect(snarkdown('***bold* italic** normal')).to.equal('<em><strong>bold</em> italic</strong> normal');
+			expect(snarkdown('***bold* italic** normal')).to.equal('<strong><em>bold</em> italic</strong> normal');
+			expect(snarkdown('***italic** bold* normal')).to.equal('<em><strong>italic</strong> bold</em> normal');
+		});
+
+		it('splits a triple run between adjacent emphasis spans', () => {
+			expect(snarkdown('**bold***italic* normal')).to.equal('<strong>bold</strong><em>italic</em> normal');
+			expect(snarkdown('*italic***bold** normal')).to.equal('<em>italic</em><strong>bold</strong> normal');
+			expect(snarkdown('__bold___italic_ normal')).to.equal('<strong>bold</strong><em>italic</em> normal');
+		});
+
+		it('closes partial triple runs before punctuation', () => {
+			expect(snarkdown('***bold*, italic** normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');
+			expect(snarkdown('___bold_, italic__ normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');
+		});
+
+		it('keeps a triple run after whitespace nested', () => {
+			expect(snarkdown('**bold ***nested*** bold** normal')).to.equal('<strong>bold <em><strong>nested</strong></em> bold</strong> normal');
+		});
+
+		it('opens emphasis before punctuation after whitespace', () => {
+			expect(snarkdown('***outer *!inner* outer*** normal')).to.equal('<em><strong>outer <em>!inner</em> outer</strong></em> normal');
 		});
 	});
 

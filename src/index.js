@@ -26,21 +26,19 @@ function encodeAttr(str) {
 export default function parse(md, prevLinks) {
 	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|___|\*\*\*|__|\*\*|[_*]|~~)/gm,
 		context = [],
-		out = '',
+		tripleStarts = [],
+		out = [],
 		links = prevLinks || {},
 		last = 0,
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
-		// `***` / `___` is a combined <em><strong> pair, not two separate toggles.
-		// A triple run also closes a single+double pair that is already open
-		// (`*italic **bold***` / `**bold *italic***`), and a single/double run
-		// closes just its half of an open triple pair when it cannot open a
-		// nested run (followed by whitespace or end of input).
+		// A triple run can close open emphasis or start a combined pair.
 		if (token === '***' || token === '___') {
 			let top = context[context.length-1], second = context[context.length-2];
 			if (top === token) {
 				context.pop();
+				tripleStarts.pop();
 				return '</strong></em>';
 			}
 			let single = token[0], dbl = single + single;
@@ -52,22 +50,28 @@ export default function parse(md, prevLinks) {
 				context.pop(); context.pop();
 				return '</em></strong>';
 			}
+			// Between spans, close the open marker and open the remainder.
+			if ((top === dbl || top === single) && /\S/.test(md.charAt(last-4)) && /\S/.test(md.charAt(last))) {
+				context[context.length-1] = top === dbl ? single : dbl;
+				return top === dbl ? '</strong><em>' : '</em><strong>';
+			}
 			context.push(token);
+			tripleStarts.push(out.length + 1); // The opening chunk follows prev.
 			return '<em><strong>';
 		}
-		// Single/double run against an open triple pair of the same marker:
+		// Choose the opening order that leaves the closing tags properly nested.
 		let top = context[context.length-1];
 		if ((top === '***' || top === '___') && token[0] === top[0]) {
-			let next = md[tokenizer.lastIndex];
-			if (next === undefined || /\s/.test(next)) {
+			let before = md.charAt(last-token.length-1), next = md.charAt(last);
+			if (!next || /\s/.test(next) || (/\S/.test(before) && /[!-/:-@[-`{-~]/.test(next))) {
+				let start = tripleStarts.pop();
 				if (token.length === 1) {
+					out[start] = '<strong><em>';
 					context[context.length-1] = top[0] + top[0];
 					return '</em>';
 				}
-				if (token.length === 2) {
-					context[context.length-1] = top[0];
-					return '</strong>';
-				}
+				context[context.length-1] = top[0];
+				return '</strong>';
 			}
 		}
 		let desc = TAGS[token[1] || ''];
@@ -120,8 +124,8 @@ export default function parse(md, prevLinks) {
 		}
 		// Links:
 		else if (token[10]) {
-			out = out.replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`);
 			chunk = flush() + '</a>';
+			out = [out.join('').replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`)];
 		}
 		else if (token[9]) {
 			chunk = '<a>';
@@ -139,9 +143,8 @@ export default function parse(md, prevLinks) {
 		else if (token[17] || token[1]) {
 			chunk = tag(token[17] || '--');
 		}
-		out += prev;
-		out += chunk;
+		out.push(prev, chunk);
 	}
 
-	return (out + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
+	return (out.join('') + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
 }
