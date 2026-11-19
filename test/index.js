@@ -53,6 +53,12 @@ describe('snarkdown()', () => {
 			expect(snarkdown('__first_____second_ end__ plain')).to.equal(expected);
 		});
 
+		it('closes partial asterisk runs within words', () => {
+			expect(snarkdown('***bold*ness** normal')).to.equal('<strong><em>bold</em>ness</strong> normal');
+			expect(snarkdown('***bold**ness* normal')).to.equal('<em><strong>bold</strong>ness</em> normal');
+			expect(snarkdown('***outer (*inner*) outer*** normal')).to.equal('<em><strong>outer (<em>inner</em>) outer</strong></em> normal');
+		});
+
 		it('closes partial triple runs before punctuation', () => {
 			expect(snarkdown('***bold*, italic** normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');
 			expect(snarkdown('___bold_, italic__ normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');

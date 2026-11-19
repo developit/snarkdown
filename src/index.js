@@ -63,7 +63,9 @@ export default function parse(md, prevLinks) {
 		let top = context[context.length-1];
 		if ((top === '***' || top === '___') && token[0] === top[0]) {
 			let before = md.charAt(last-token.length-1), next = md.charAt(last);
-			if (!next || /\s/.test(next) || (/\S/.test(before) && /[!-/:-@[-`{-~]/.test(next))) {
+			let punctuation = /[!-/:-@[-`{-~]/;
+			let intraword = token[0] === '*' && !punctuation.test(before);
+			if (!next || /\s/.test(next) || (/\S/.test(before) && (intraword || punctuation.test(next)))) {
 				let start = tripleStarts.pop();
 				if (token.length === 1) {
 					out[start] = '<strong><em>';
