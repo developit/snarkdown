@@ -24,14 +24,58 @@ function encodeAttr(str) {
 
 /** Parse Markdown into an HTML String. */
 export default function parse(md, prevLinks) {
-	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
+	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n)|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})\s*(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|___|\*\*\*|__|\*\*|[_*]|~~)/gm,
 		context = [],
-		out = '',
+		tripleStarts = [],
+		out = [],
 		links = prevLinks || {},
 		last = 0,
 		chunk, prev, token, inner, t;
 
 	function tag(token) {
+		// A triple run can close open emphasis or start a combined pair.
+		if (token === '***' || token === '___') {
+			let top = context[context.length-1], second = context[context.length-2];
+			if (top === token) {
+				context.pop();
+				tripleStarts.pop();
+				return '</strong></em>';
+			}
+			let single = token[0], dbl = single + single;
+			if (top === dbl && second === single) {
+				context.pop(); context.pop();
+				return '</strong></em>';
+			}
+			if (top === single && second === dbl) {
+				context.pop(); context.pop();
+				return '</em></strong>';
+			}
+			// Between spans, close the open marker and open the remainder.
+			if ((top === dbl || top === single) && /\S/.test(md.charAt(last-4)) && /\S/.test(md.charAt(last))) {
+				context[context.length-1] = top === dbl ? single : dbl;
+				return top === dbl ? '</strong><em>' : '</em><strong>';
+			}
+			context.push(token);
+			tripleStarts.push(out.length + 1); // The opening chunk follows prev.
+			return '<em><strong>';
+		}
+		// Choose the opening order that leaves the closing tags properly nested.
+		let top = context[context.length-1];
+		if ((top === '***' || top === '___') && token[0] === top[0]) {
+			let before = md.charAt(last-token.length-1), next = md.charAt(last);
+			let punctuation = /[!-/:-@[-`{-~]/;
+			let intraword = token[0] === '*' && !punctuation.test(before);
+			if (!next || /\s/.test(next) || (/\S/.test(before) && (intraword || punctuation.test(next)))) {
+				let start = tripleStarts.pop();
+				if (token.length === 1) {
+					out[start] = '<strong><em>';
+					context[context.length-1] = top[0] + top[0];
+					return '</em>';
+				}
+				context[context.length-1] = top[0];
+				return '</strong>';
+			}
+		}
 		let desc = TAGS[token[1] || ''];
 		let end = context[context.length-1] == token;
 		if (!desc) return token;
@@ -54,8 +98,16 @@ export default function parse(md, prevLinks) {
 
 	while ( (token=tokenizer.exec(md)) ) {
 		prev = md.substring(last, token.index);
-		last = tokenizer.lastIndex;
 		chunk = token[0];
+		if (token[17] === '***' || token[17] === '___') {
+			let marker = chunk[0];
+			if (md.charAt(token.index-1) === marker || md.charAt(tokenizer.lastIndex) === marker) {
+				// Preserve the original double delimiters in runs longer than three.
+				chunk = token[17] = chunk.slice(0, 2);
+				tokenizer.lastIndex--;
+			}
+		}
+		last = tokenizer.lastIndex;
 		if (prev.match(/[^\\](\\\\)*\\$/)) {
 			// escaped
 		}
@@ -82,8 +134,8 @@ export default function parse(md, prevLinks) {
 		}
 		// Links:
 		else if (token[10]) {
-			out = out.replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`);
 			chunk = flush() + '</a>';
+			out = [out.join('').replace('<a>', `<a href="${encodeAttr(token[11] || links[prev.toLowerCase()])}">`)];
 		}
 		else if (token[9]) {
 			chunk = '<a>';
@@ -101,9 +153,8 @@ export default function parse(md, prevLinks) {
 		else if (token[17] || token[1]) {
 			chunk = tag(token[17] || '--');
 		}
-		out += prev;
-		out += chunk;
+		out.push(prev, chunk);
 	}
 
-	return (out + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
+	return (out.join('') + md.substring(last) + flush()).replace(/^\n+|\n+$/g, '');
 }

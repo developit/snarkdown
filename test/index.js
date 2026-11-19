@@ -18,6 +18,59 @@ describe('snarkdown()', () => {
 		it('parses italics with _', () => {
 			expect(snarkdown('I _like_ tiny libraries')).to.equal('I <em>like</em> tiny libraries');
 		});
+
+		it('parses nested bold+italic with ***', () => {
+			expect(snarkdown('I ***like*** tiny libraries')).to.equal('I <em><strong>like</strong></em> tiny libraries');
+		});
+
+		it('parses nested bold+italic with ___', () => {
+			expect(snarkdown('I ___like___ tiny libraries')).to.equal('I <em><strong>like</strong></em> tiny libraries');
+		});
+
+		it('closes an open single+double pair with ***', () => {
+			expect(snarkdown('*italic **bold*** normal')).to.equal('<em>italic <strong>bold</strong></em> normal');
+		});
+
+		it('closes each half of *** with single and double runs', () => {
+			expect(snarkdown('***bold* italic** normal')).to.equal('<strong><em>bold</em> italic</strong> normal');
+			expect(snarkdown('***italic** bold* normal')).to.equal('<em><strong>italic</strong> bold</em> normal');
+		});
+
+		it('splits a triple run between adjacent emphasis spans', () => {
+			expect(snarkdown('**bold***italic* normal')).to.equal('<strong>bold</strong><em>italic</em> normal');
+			expect(snarkdown('*italic***bold** normal')).to.equal('<em>italic</em><strong>bold</strong> normal');
+			expect(snarkdown('__bold___italic_ normal')).to.equal('<strong>bold</strong><em>italic</em> normal');
+		});
+
+		it('preserves adjacent bold spans separated by four delimiters', () => {
+			expect(snarkdown('**first****second** plain')).to.equal('<strong>first</strong><strong>second</strong> plain');
+			expect(snarkdown('__first____second__ plain')).to.equal('<strong>first</strong><strong>second</strong> plain');
+		});
+
+		it('does not treat the end of a longer run as a triple delimiter', () => {
+			const expected = '<strong>first</strong><strong><em>second</em> end</strong> plain';
+			expect(snarkdown('**first*****second* end** plain')).to.equal(expected);
+			expect(snarkdown('__first_____second_ end__ plain')).to.equal(expected);
+		});
+
+		it('closes partial asterisk runs within words', () => {
+			expect(snarkdown('***bold*ness** normal')).to.equal('<strong><em>bold</em>ness</strong> normal');
+			expect(snarkdown('***bold**ness* normal')).to.equal('<em><strong>bold</strong>ness</em> normal');
+			expect(snarkdown('***outer (*inner*) outer*** normal')).to.equal('<em><strong>outer (<em>inner</em>) outer</strong></em> normal');
+		});
+
+		it('closes partial triple runs before punctuation', () => {
+			expect(snarkdown('***bold*, italic** normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');
+			expect(snarkdown('___bold_, italic__ normal')).to.equal('<strong><em>bold</em>, italic</strong> normal');
+		});
+
+		it('keeps a triple run after whitespace nested', () => {
+			expect(snarkdown('**bold ***nested*** bold** normal')).to.equal('<strong>bold <em><strong>nested</strong></em> bold</strong> normal');
+		});
+
+		it('opens emphasis before punctuation after whitespace', () => {
+			expect(snarkdown('***outer *!inner* outer*** normal')).to.equal('<em><strong>outer <em>!inner</em> outer</strong></em> normal');
+		});
 	});
 
 	describe('titles', () => {
