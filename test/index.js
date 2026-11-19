@@ -47,6 +47,15 @@ describe('snarkdown()', () => {
 			expect(snarkdown('#\ttitle')).to.equal('<h1>title</h1>');
 		});
 
+		it('allows empty ATX titles after a space or tab', () => {
+			expect(snarkdown('# ')).to.equal('<h1></h1>');
+			expect(snarkdown('##\t')).to.equal('<h2></h2>');
+		});
+
+		it('keeps dashes in a title as text', () => {
+			expect(snarkdown('# ---')).to.equal('<h1>---</h1>');
+		});
+
 		it('parses titles with reference links', () => {
 			expect(
 				snarkdown('# I like [tiny libraries]\n\n[tiny libraries]: https://github.com/developit/snarkdown')

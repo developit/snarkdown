@@ -24,7 +24,7 @@ function encodeAttr(str) {
 
 /** Parse Markdown into an HTML String. */
 export default function parse(md, prevLinks) {
-	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n|^---+(?:\n|$))|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})[ \t]+(.+)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
+	let tokenizer = /((?:^|\n+)(?:\n---+|\* \*(?: \*)+)\n|^---+(?:\n|$))|(?:^``` *(\w*)\n([\s\S]*?)\n```$)|((?:(?:^|\n+)(?:\t|  {2,}).+)+\n*)|((?:(?:^|\n)([>*+-]|\d+\.)\s+.*)+)|(?:!\[([^\]]*?)\]\(([^)]+?)\))|(\[)|(\](?:\(([^)]+?)\))?)|(?:(?:^|\n+)([^\s].*)\n(-{3,}|={3,})(?:\n+|$))|(?:(?:^|\n+)(#{1,6})[ \t]+(.*)(?:\n+|$))|(?:`([^`].*?)`)|(  \n\n*|\n{2,}|__|\*\*|[_*]|~~)/gm,
 		context = [],
 		out = '',
 		links = prevLinks || {},
@@ -91,7 +91,9 @@ export default function parse(md, prevLinks) {
 		// Headings:
 		else if (token[12] || token[14]) {
 			t = 'h' + (token[14] ? token[14].length : (token[13]>'=' ? 1 : 2));
-			chunk = '<'+t+'>' + parse(token[12] || token[15], links) + '</'+t+'>';
+			let title = token[12] || token[15];
+			// A line of dashes is literal inside a heading.
+			chunk = '<'+t+'>' + (/^---+$/.test(title) ? title : parse(title, links)) + '</'+t+'>';
 		}
 		// `code`:
 		else if (token[16]) {
